@@ -13,6 +13,15 @@ _Changes that are merged but not yet released._
 
 ---
 
+## [0.1.1] — 2026-05-27
+
+### Fixed
+- Fetch PR diffs via the GitHub REST API (`/repos/{owner}/{repo}/pulls/{number}`)
+  instead of the web `.diff` URL, which returned 404 in GitHub Actions for many repos
+- Add clear errors for invalid tokens (401), missing permissions (403), and missing PRs (404)
+
+---
+
 ## [0.1.0] — 2025-01-01
 
 ### Added
@@ -31,5 +40,6 @@ _Changes that are merged but not yet released._
 - GitHub Actions workflows — Ollama (self-hosted), OpenAI (hosted), CI, PyPI publish
 - Pre-commit hook support
 
-[Unreleased]: https://github.com/iamakashsoni/inspectra/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/iamakashsoni/inspectra/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/iamakashsoni/inspectra/releases/tag/v0.1.1
 [0.1.0]: https://github.com/iamakashsoni/inspectra/releases/tag/v0.1.0
