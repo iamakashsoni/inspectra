@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-import httpx
 import pytest
 
 from inspectra.github.pull_request import get_pr_diff
@@ -40,6 +39,8 @@ def test_get_pr_diff_maps_http_errors(status_code, expected_exception, expected_
     mock_response.status_code = status_code
     mock_response.text = ""
 
-    with patch("inspectra.github.pull_request.httpx.get", return_value=mock_response):
-        with pytest.raises(expected_exception, match=expected_message):
-            get_pr_diff("ghs_testtoken", "owner/repo", 7)
+    with (
+        patch("inspectra.github.pull_request.httpx.get", return_value=mock_response),
+        pytest.raises(expected_exception, match=expected_message),
+    ):
+        get_pr_diff("ghs_testtoken", "owner/repo", 7)
