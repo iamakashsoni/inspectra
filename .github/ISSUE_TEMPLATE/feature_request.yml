@@ -1,0 +1,73 @@
+name: Feature Request
+description: Suggest an idea or improvement for Inspectra
+labels: ["enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please fill out the sections below
+        so we can understand the problem you're trying to solve.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: >
+        A clear description of the problem or limitation you're running into.
+        Good feature requests start with a real pain point.
+      placeholder: "When I review large PRs, Inspectra doesn't..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the solution you'd like
+      description: What would you like Inspectra to do?
+      placeholder: "I'd like Inspectra to automatically..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Any other approaches or workarounds you've tried?
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area does this relate to?
+      multiple: true
+      options:
+        - CLI
+        - LLM Provider (Ollama / OpenAI / Anthropic)
+        - Git diff engine
+        - Review quality / prompts
+        - GitHub integration
+        - Output format (Markdown / SARIF / Console)
+        - Caching
+        - Configuration
+        - Documentation
+        - CI/CD / GitHub Actions
+        - Other
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How important is this to you?
+      options:
+        - Nice to have
+        - Important — affects my workflow
+        - Critical — blocking my use of Inspectra
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this has not been requested before
+          required: true
+        - label: I am willing to submit a PR to implement this feature

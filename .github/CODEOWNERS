@@ -1,0 +1,23 @@
+# CODEOWNERS
+# These users are automatically requested for review when a PR touches these paths.
+# Replace @iamakashsoni with your actual GitHub username.
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global fallback — owns everything not matched below
+*                           @iamakashsoni
+
+# Core source
+src/inspectra/              @iamakashsoni
+
+# LLM provider code — review carefully for security
+src/inspectra/llm/          @iamakashsoni
+
+# GitHub integration — review carefully for token handling
+src/inspectra/github/       @iamakashsoni
+
+# CI/CD workflows
+.github/workflows/          @iamakashsoni
+
+# Dependencies — review for supply chain risk
+pyproject.toml              @iamakashsoni

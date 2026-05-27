@@ -1,0 +1,68 @@
+name: Provider Issue
+description: Problem with a specific LLM provider (Ollama / OpenAI / Anthropic)
+labels: ["provider", "bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for issues specific to an LLM provider integration.
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Which provider is affected?
+      options:
+        - Ollama (local)
+        - OpenAI
+        - Anthropic
+    validations:
+      required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: Model name
+      placeholder: "qwen2.5-coder:14b / gpt-4o-mini / claude-sonnet-4-20250514"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What went wrong?
+      placeholder: "The provider returned an empty response when..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error output
+      description: Full error message. Run with `--verbose` for more detail.
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: Inspectra version
+      placeholder: "0.1.0  (run: inspectra version)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant .inspectra.yml config (redact any secrets)
+      render: yaml
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I confirmed the provider is running and reachable
+          required: true
+        - label: I searched existing issues and this is not a duplicate
+          required: true

@@ -1,0 +1,43 @@
+name: Inspectra Review (Ollama)
+
+on:
+  pull_request:
+
+jobs:
+  inspectra:
+    runs-on: self-hosted   # Requires a runner with Ollama installed
+
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history for accurate diffs
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Inspectra
+        run: pip install inspectra
+
+      - name: Start Ollama (if not already running)
+        run: |
+          ollama serve &
+          sleep 3
+
+      - name: Pull model (if not cached)
+        run: ollama pull qwen2.5-coder:14b
+
+      - name: Run review
+        run: |
+          inspectra review \
+            --provider ollama \
+            --model qwen2.5-coder:14b \
+            --post-comment \
+            --pr ${{ github.event.pull_request.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}

@@ -1,0 +1,41 @@
+# .inspectra.yml — Inspectra configuration
+# Place this file in the root of your repository.
+
+# LLM provider: ollama | openai | anthropic
+provider: ollama
+
+# Model name (provider-specific)
+model: qwen2.5-coder:14b
+
+# Ollama connection settings (only used when provider = ollama)
+ollama:
+  host: http://localhost:11434
+  timeout: 300
+
+# Review categories (set to false to disable)
+review:
+  security: true
+  bugs: true
+  performance: true
+  maintainability: true
+  architecture: true
+  concurrency: true
+  scalability: true
+
+# Files/patterns to exclude from review
+exclude:
+  - "*.lock"
+  - "package-lock.json"
+  - "yarn.lock"
+  - "dist/*"
+  - "build/*"
+  - "*.min.js"
+  - "*.min.css"
+  - "vendor/*"
+
+# Token limits
+max_tokens: 12000
+max_chunk_tokens: 3000
+
+# LLM temperature (lower = more deterministic)
+temperature: 0.2

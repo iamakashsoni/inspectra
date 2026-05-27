@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/iamakashsoni/inspectra#readme
+    about: Read the full README and docs before opening an issue
+
+  - name: 💬 Discussions
+    url: https://github.com/iamakashsoni/inspectra/discussions
+    about: Ask questions and share ideas in Discussions
+
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/iamakashsoni/inspectra/security/advisories/new
+    about: Report a security vulnerability privately via GitHub Advisories

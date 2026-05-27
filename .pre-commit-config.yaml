@@ -1,0 +1,17 @@
+# .pre-commit-config.yaml
+# Runs Inspectra as a pre-push hook so you catch issues before opening a PR.
+#
+# Install:
+#   pip install pre-commit
+#   pre-commit install --hook-type pre-push
+
+repos:
+  - repo: local
+    hooks:
+      - id: inspectra
+        name: Inspectra AI Code Review
+        language: system
+        entry: inspectra review --staged --no-pr-summary --no-fail-on-high
+        pass_filenames: false
+        stages: [pre-push]
+        always_run: true

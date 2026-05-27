@@ -1,0 +1,36 @@
+name: Inspectra Review (OpenAI)
+
+on:
+  pull_request:
+
+jobs:
+  inspectra:
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Inspectra
+        run: pip install inspectra
+
+      - name: Run review
+        run: |
+          inspectra review \
+            --provider openai \
+            --model gpt-4o-mini \
+            --post-comment \
+            --pr ${{ github.event.pull_request.number }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}

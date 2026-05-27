@@ -1,0 +1,101 @@
+name: Bug Report
+description: Something isn't working as expected
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+        Please fill out the sections below so we can reproduce and fix it quickly.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: "inspectra review crashes when..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Exact commands you ran.
+      placeholder: |
+        1. Run `inspectra review --provider openai`
+        2. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      placeholder: "I expected it to post a comment on the PR."
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output
+      description: Paste the full error or stack trace. Run with `--verbose` for more detail.
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: Inspectra version
+      placeholder: "0.1.0  (run: inspectra version)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: LLM provider
+      options:
+        - Ollama (local)
+        - OpenAI
+        - Anthropic
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - Windows
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: "3.12.0  (run: python --version)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: .inspectra.yml (redact any secrets)
+      render: yaml
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
+        - label: I reproduced this with the latest version of Inspectra
+          required: true
