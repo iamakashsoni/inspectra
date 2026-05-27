@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -18,64 +19,72 @@ def test_version_command():
 
 
 def test_init_creates_config(tmp_path):
-    with runner.isolated_filesystem(temp_dir=tmp_path):
+    orig = os.getcwd()
+    try:
+        os.chdir(tmp_path)
         result = runner.invoke(app, ["init"])
         assert result.exit_code == 0
-        assert Path(".inspectra.yml").exists()
+        assert (tmp_path / ".inspectra.yml").exists()
+    finally:
+        os.chdir(orig)
 
 
 def test_init_does_not_overwrite_existing(tmp_path):
-    with runner.isolated_filesystem(temp_dir=tmp_path):
-        Path(".inspectra.yml").write_text("provider: openai\n")
+    orig = os.getcwd()
+    try:
+        os.chdir(tmp_path)
+        (tmp_path / ".inspectra.yml").write_text("provider: openai\n")
         result = runner.invoke(app, ["init"])
         assert result.exit_code == 0
         # Should warn, not overwrite
-        content = Path(".inspectra.yml").read_text()
-        assert "openai" in content
+        assert "openai" in (tmp_path / ".inspectra.yml").read_text()
+    finally:
+        os.chdir(orig)
 
 
 def test_review_dry_run_no_diff(tmp_path):
-    """When there's no diff, review should exit cleanly."""
-    with runner.isolated_filesystem(temp_dir=tmp_path):
-        # No git repo, no diff → nothing to review
-        result = runner.invoke(
-            app,
-            ["review", "--dry-run", "--no-pr-summary"],
-        )
-        # Either exits 0 (nothing to review) or fails gracefully
+    """When there's no git repo / diff, review should exit cleanly."""
+    orig = os.getcwd()
+    try:
+        os.chdir(tmp_path)
+        result = runner.invoke(app, ["review", "--dry-run", "--no-pr-summary"])
+        # Either 0 (nothing to review) or 1 (no git repo) — no crash
         assert result.exit_code in (0, 1)
+        assert result.exception is None or isinstance(result.exception, SystemExit)
+    finally:
+        os.chdir(orig)
 
 
 def test_review_missing_openai_key_errors(tmp_path):
-    """review --provider openai without API key should show an error."""
-    with runner.isolated_filesystem(temp_dir=tmp_path):
+    """review --provider openai without API key should show a clear error."""
+    orig = os.getcwd()
+    try:
+        os.chdir(tmp_path)
         result = runner.invoke(
             app,
             ["review", "--provider", "openai", "--dry-run", "--no-pr-summary"],
+            env={"OPENAI_API_KEY": ""},
         )
-        # The review will either find no diff (exit 0) or hit missing key (exit 1)
-        # Either is acceptable — we just don't want a crash/traceback
         assert result.exit_code in (0, 1)
         assert result.exception is None or isinstance(result.exception, SystemExit)
+    finally:
+        os.chdir(orig)
 
 
 def test_review_pr_number_requires_token(tmp_path):
     """Passing --pr without GITHUB_TOKEN must produce a helpful error."""
-    with runner.isolated_filesystem(temp_dir=tmp_path):
-        # Ensure no env vars bleed in
-        import os
-        env_backup = os.environ.pop("GITHUB_TOKEN", None)
-        env_backup2 = os.environ.pop("GITHUB_REPOSITORY", None)
-        try:
-            result = runner.invoke(
-                app,
-                ["review", "--pr", "42", "--no-pr-summary"],
-                env={"GITHUB_TOKEN": "", "GITHUB_REPOSITORY": ""},
-            )
-            assert result.exit_code == 1
-            assert "GITHUB_TOKEN" in result.output or "GITHUB_REPOSITORY" in result.output
-        finally:
-            if env_backup:
-                os.environ["GITHUB_TOKEN"] = env_backup
-            if env_backup2:
-                os.environ["GITHUB_REPOSITORY"] = env_backup2
+    orig = os.getcwd()
+    try:
+        os.chdir(tmp_path)
+        result = runner.invoke(
+            app,
+            ["review", "--pr", "42", "--no-pr-summary"],
+            env={"GITHUB_TOKEN": "", "GITHUB_REPOSITORY": ""},
+        )
+        assert result.exit_code == 1
+        assert (
+            "GITHUB_TOKEN" in result.output
+            or "GITHUB_REPOSITORY" in result.output
+        )
+    finally:
+        os.chdir(orig)
