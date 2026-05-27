@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from github import Github
 
@@ -10,7 +10,7 @@ from inspectra.review.severity import ReviewResult, Severity
 from inspectra.utils.logger import logger
 
 
-class ReviewEvent(str, Enum):
+class ReviewEvent(StrEnum):
     APPROVE = "APPROVE"
     REQUEST_CHANGES = "REQUEST_CHANGES"
     COMMENT = "COMMENT"

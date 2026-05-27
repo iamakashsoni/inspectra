@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import pytest
-
 from inspectra.git.changed_files import get_reviewable_files
-
 
 VALID_DIFF = """\
 diff --git a/src/app.py b/src/app.py

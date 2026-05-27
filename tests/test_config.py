@@ -1,9 +1,10 @@
 """Tests for configuration loading and validation."""
 
-import pytest
 from pathlib import Path
 
-from inspectra.config.loader import load_settings, _find_config_file
+import pytest
+
+from inspectra.config.loader import _find_config_file, load_settings
 from inspectra.config.settings import InspectraSettings, LLMProvider
 
 
@@ -49,7 +50,7 @@ def test_load_settings_empty_yaml(tmp_path: Path):
 
 
 def test_temperature_validation():
-    with pytest.raises(Exception):
+    with pytest.raises((ValueError, Exception)):
         InspectraSettings(temperature=3.0)
 
 

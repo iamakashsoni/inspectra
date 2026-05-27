@@ -2,6 +2,11 @@ name: Inspectra Review (Ollama)
 
 on:
   pull_request:
+    branches:
+      - main
+      - master
+      - UAT
+      - develop
 
 jobs:
   inspectra:

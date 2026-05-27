@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from inspectra.review.severity import ReviewResult, Severity
 
-
 _SEVERITY_ORDER = [
     Severity.CRITICAL,
     Severity.HIGH,

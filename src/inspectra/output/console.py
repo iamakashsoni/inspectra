@@ -56,7 +56,10 @@ def print_results(results: list[ReviewResult], pr_summary: str = "") -> None:
         console.print(Rule(f"[cyan]{result.file_path}[/cyan]"))
 
         for issue in sorted(result.issues, key=lambda i: _severity_sort_key(i.severity)):
-            title_text = Text(f"{issue.severity.emoji} {issue.title}", style=issue.severity.rich_style)
+            title_text = Text(
+                f"{issue.severity.emoji} {issue.title}",
+                style=issue.severity.rich_style,
+            )
             lines: list[str] = [
                 f"[bold]Category:[/bold] {issue.category}",
                 f"[bold]Severity:[/bold] {issue.severity.value.upper()}",

@@ -1,6 +1,5 @@
 """Tests for severity models."""
 
-import pytest
 
 from inspectra.review.severity import ReviewIssue, ReviewResult, Severity
 

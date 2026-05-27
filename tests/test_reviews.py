@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from inspectra.github.reviews import ReviewEvent, decide_review_event
 from inspectra.review.severity import ReviewIssue, ReviewResult, Severity
 

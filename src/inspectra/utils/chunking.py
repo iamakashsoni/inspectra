@@ -33,7 +33,9 @@ def chunk_diff_by_file(
         token_count = count_tokens(diff_text)
 
         if token_count <= max_chunk_tokens:
-            chunks.append(DiffChunk(file_path=file_path, content=diff_text, token_count=token_count))
+            chunks.append(
+                DiffChunk(file_path=file_path, content=diff_text, token_count=token_count)
+            )
         else:
             # Split by hunk headers (@@ ... @@)
             sub_chunks = _split_by_hunks(file_path, diff_text, max_chunk_tokens)

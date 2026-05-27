@@ -1,13 +1,12 @@
 """Settings and configuration models for Inspectra."""
 
-from enum import Enum
-from typing import Any
+from enum import StrEnum
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 
-class LLMProvider(str, Enum):
+class LLMProvider(StrEnum):
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     OLLAMA = "ollama"

@@ -7,7 +7,6 @@ import yaml
 
 from inspectra.config.settings import InspectraSettings, OllamaConfig, ReviewCategories
 
-
 _CONFIG_FILENAME = ".inspectra.yml"
 
 

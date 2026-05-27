@@ -1,9 +1,7 @@
 """Tests for the git diff parser."""
 
-import pytest
 
 from inspectra.git.diff_parser import extract_changed_lines, parse_diff
-
 
 # A self-consistent unified diff:
 # hunk @@ -1,4 +1,6 @@ => 4 lines in old, 6 lines in new

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from inspectra.config.settings import ReviewCategories
 
-
 _SYSTEM_CONTEXT = """\
 You are Inspectra, an AI code review assistant that behaves like a senior software engineer.
 
@@ -31,7 +30,8 @@ Respond ONLY with a JSON object matching this schema (no markdown fences):
     {
       "title": "<short issue title>",
       "severity": "<critical|high|medium|low|info>",
-      "category": "<Security|Bugs|Performance|Maintainability|Architecture|Concurrency|Scalability>",
+      "category": "<Security|Bugs|Performance|Maintainability
+      |Architecture|Concurrency|Scalability>",
       "explanation": "<clear explanation of the problem>",
       "suggested_fix": "<concrete code or description of fix>",
       "file_path": "<file path>",

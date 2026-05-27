@@ -2,7 +2,7 @@
 
 import pytest
 
-from inspectra.config.settings import InspectraSettings, LLMProvider, ReviewCategories
+from inspectra.config.settings import InspectraSettings, LLMProvider
 
 
 @pytest.fixture

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class Severity(str, Enum):
+class Severity(StrEnum):
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -35,7 +35,7 @@ class Severity(str, Enum):
         }[self]
 
     @classmethod
-    def from_string(cls, value: str) -> "Severity":
+    def from_string(cls, value: str) -> Severity:
         try:
             return cls(value.lower())
         except ValueError:

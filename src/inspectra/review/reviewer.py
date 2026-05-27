@@ -15,7 +15,9 @@ from inspectra.utils.logger import logger
 class ChunkReviewer:
     """Reviews a single diff chunk using an LLM provider."""
 
-    def __init__(self, provider: BaseLLMProvider, categories: ReviewCategories | None = None) -> None:
+    def __init__(
+        self, provider: BaseLLMProvider, categories: ReviewCategories | None = None
+    ) -> None:
         self.provider = provider
         self.categories = categories
 

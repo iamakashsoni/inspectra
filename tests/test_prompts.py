@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from inspectra.config.settings import ReviewCategories
 from inspectra.review.prompts import build_pr_summary_prompt, build_review_prompt
 
@@ -63,7 +61,10 @@ def test_build_review_prompt_no_categories_uses_defaults():
 
 
 def test_build_pr_summary_prompt_contains_file_data():
-    summary_input = "File: auth/service.py\nSummary: Has SQL injection.\nIssues:\n  - [CRITICAL] SQLi"
+    summary_input = (
+        "File: auth/service.py\nSummary: Has SQL injection.\n"
+        "Issues:\n  - [CRITICAL] SQLi"
+    )
     prompt = build_pr_summary_prompt(summary_input)
     assert "auth/service.py" in prompt
     assert "SQL injection" in prompt

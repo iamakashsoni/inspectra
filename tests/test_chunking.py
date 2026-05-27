@@ -1,9 +1,7 @@
 """Tests for diff chunking logic."""
 
-import pytest
 
-from inspectra.utils.chunking import DiffChunk, chunk_diff_by_file
-
+from inspectra.utils.chunking import chunk_diff_by_file
 
 SMALL_DIFF = """\
 --- a/foo.py

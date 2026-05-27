@@ -32,8 +32,10 @@ class OpenAIProvider(BaseLLMProvider):
                 {
                     "role": "system",
                     "content": (
-                        "You are Inspectra, a senior software engineer performing a thorough code review. "
-                        "Be precise, constructive, and focus on correctness, security, and maintainability."
+                        "You are Inspectra, a senior software engineer "
+                        "performing a thorough code review. Be precise, "
+                        "constructive, and focus on correctness, security, "
+                        "and maintainability."
                     ),
                 },
                 {"role": "user", "content": prompt},

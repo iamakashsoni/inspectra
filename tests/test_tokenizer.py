@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from inspectra.utils.tokenizer import count_tokens, fits_in_budget, truncate_to_budget
 
 

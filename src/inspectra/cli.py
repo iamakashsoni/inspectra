@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -25,55 +24,55 @@ err_console = Console(stderr=True)
 
 @app.command()
 def review(
-    provider: Optional[str] = typer.Option(
+    provider: str | None = typer.Option(  # noqa: B008
         None, "--provider", "-p",
         help="LLM provider: ollama | openai | anthropic",
     ),
-    model: Optional[str] = typer.Option(
+    model: str | None = typer.Option(  # noqa: B008
         None, "--model", "-m",
         help="Model name (e.g. qwen2.5-coder:14b, gpt-4o-mini)",
     ),
-    config: Optional[Path] = typer.Option(
+    config: Path | None = typer.Option(  # noqa: B008
         None, "--config", "-c",
         help="Path to .inspectra.yml",
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(  # noqa: B008
         None, "--output", "-o",
         help="Write Markdown report to this file",
     ),
-    sarif: Optional[Path] = typer.Option(
+    sarif: Path | None = typer.Option(  # noqa: B008
         None, "--sarif",
         help="Write SARIF report to this file (for GitHub Code Scanning)",
     ),
-    pr_number: Optional[int] = typer.Option(
+    pr_number: int | None = typer.Option(  # noqa: B008
         None, "--pr",
         help="GitHub PR number (requires GITHUB_TOKEN + GITHUB_REPOSITORY)",
     ),
-    post_comment: bool = typer.Option(
+    post_comment: bool = typer.Option(  # noqa: B008
         False, "--post-comment",
         help="Post review as a GitHub PR comment",
     ),
-    with_pr_summary: bool = typer.Option(
+    with_pr_summary: bool = typer.Option(  # noqa: B008
         True, "--pr-summary/--no-pr-summary",
         help="Generate an AI PR-level summary (on by default)",
     ),
-    staged: bool = typer.Option(
+    staged: bool = typer.Option(  # noqa: B008
         False, "--staged",
         help="Review staged (cached) changes only",
     ),
-    dry_run: bool = typer.Option(
+    dry_run: bool = typer.Option(  # noqa: B008
         False, "--dry-run",
         help="Parse diff but skip LLM calls",
     ),
-    fail_on_high: bool = typer.Option(
+    fail_on_high: bool = typer.Option(  # noqa: B008
         True, "--fail-on-high/--no-fail-on-high",
         help="Exit with code 1 when critical/high issues are found",
     ),
-    cache: bool = typer.Option(
+    cache: bool = typer.Option(  # noqa: B008
         False, "--cache/--no-cache",
         help="Cache LLM responses to .inspectra_cache/ to skip re-reviewing unchanged hunks",
     ),
-    verbose: bool = typer.Option(
+    verbose: bool = typer.Option(  # noqa: B008
         False, "--verbose", "-v",
         help="Enable verbose logging",
     ),
@@ -90,7 +89,7 @@ def review(
     from inspectra.review.formatter import results_to_pr_comment
     from inspectra.utils.logger import get_logger
 
-    log = get_logger(verbose=verbose)
+    get_logger(verbose=verbose)
 
     # ── Settings ──────────────────────────────────────────────────────────────
     overrides: dict = {}
@@ -107,7 +106,7 @@ def review(
         settings = load_settings(config_path=config, **overrides)
     except Exception as exc:
         err_console.print(f"[red]Config error:[/red] {exc}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     # ── Fetch diff ────────────────────────────────────────────────────────────
     raw_diff: str | None = None
@@ -154,7 +153,7 @@ def review(
         provider_instance = build_provider(settings, use_cache=cache)
     except ValueError as exc:
         err_console.print(f"[red]Provider error:[/red] {exc}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     # ── Run review ────────────────────────────────────────────────────────────
     engine = ReviewEngine(provider=provider_instance, settings=settings)
@@ -228,6 +227,7 @@ def version() -> None:
 def models() -> None:
     """List available models in the local Ollama instance."""
     import asyncio
+
     from inspectra.llm.ollama_provider import OllamaProvider
 
     provider_inst = OllamaProvider()
@@ -303,7 +303,7 @@ temperature: 0.2
 
 @app.command(name="cache-clear")
 def cache_clear(
-    cache_dir: Path = typer.Option(
+    cache_dir: Path = typer.Option(  # noqa: B008
         Path(".inspectra_cache"),
         "--dir",
         help="Cache directory to clear",

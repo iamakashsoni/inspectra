@@ -18,7 +18,7 @@ def validate_token(token: str) -> bool:
     """Return True if the token is valid and has the required permissions."""
     try:
         g = get_github_client(token)
-        g.get_user().login
+        _ = g.get_user().login
         return True
     except GithubException:
         return False
