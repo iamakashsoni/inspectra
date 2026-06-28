@@ -43,7 +43,18 @@ Reviews your git diffs with LLMs — locally via **Ollama** (free, private) or v
 pip install inspectra
 ```
 
-### Review with Ollama (free, local)
+### Option A — Nvidia NIM (free cloud, fastest start)
+
+Get a free API key at [build.nvidia.com](https://build.nvidia.com), then:
+
+```bash
+export NVIDIA_API_KEY=nvapi-...
+inspectra review --provider nvidia --model meta/llama-3.3-70b-instruct
+```
+
+No GPU, no Docker, no local setup. Uses a 70B model for free.
+
+### Option B — Ollama (free, fully local, private)
 
 ```bash
 # Install and start Ollama
@@ -55,11 +66,16 @@ ollama pull qwen2.5-coder:14b
 inspectra review
 ```
 
-### Review with a cloud provider
+### Option C — OpenAI / Anthropic (paid cloud)
 
 ```bash
+# OpenAI
 export OPENAI_API_KEY=sk-...
 inspectra review --provider openai --model gpt-4o-mini
+
+# Anthropic
+export ANTHROPIC_API_KEY=sk-ant-...
+inspectra review --provider anthropic --model claude-sonnet-4-20250514
 ```
 
 ### Review a GitHub PR
@@ -68,8 +84,26 @@ inspectra review --provider openai --model gpt-4o-mini
 export GITHUB_TOKEN=ghp_...
 export GITHUB_REPOSITORY=myorg/myrepo
 
-inspectra review --provider ollama --pr 42 --post-comment
+inspectra review --provider nvidia --pr 42 --post-comment
 ```
+
+---
+
+## Get a free Nvidia API key
+
+Nvidia offers **free cloud access** to production-grade models (Llama 3.3 70B, DeepSeek-R1, Mistral, Qwen, Phi, and more) via [build.nvidia.com](https://build.nvidia.com) — no GPU or Docker required.
+
+1. Open [build.nvidia.com](https://build.nvidia.com)
+2. Sign in with an Nvidia account → **Get API Key** (starts with `nvapi-`)
+3. Pick a model from the catalog (e.g. `meta/llama-3.3-70b-instruct`)
+4. Review:
+
+```bash
+export NVIDIA_API_KEY=nvapi-...
+inspectra review --provider nvidia --model meta/llama-3.3-70b-instruct
+```
+
+This is the easiest way to get high-quality reviews without running Ollama locally or paying for OpenAI/Anthropic.
 
 ---
 
@@ -115,14 +149,41 @@ Five providers, one interface. Switch with `--provider`, no code changes.
 | Provider | Default model | Default concurrency | Free | Private |
 |----------|---------------|---------------------|:----:|:-------:|
 | `ollama` | `qwen2.5-coder:14b` | 3 | ✅ | ✅ |
+| `nvidia` | `meta/llama-3.3-70b-instruct` | 5 | ✅ | ✅ (self-hosted NIM) |
 | `openai` | `gpt-4o-mini` | 10 | ❌ | ❌ |
 | `anthropic` | `claude-sonnet-4-20250514` | 8 | ❌ | ❌ |
-| `nvidia` | `meta/llama-3.3-70b-instruct` | 5 | ❌ | ✅ (self-hosted NIM) |
 | `openrouter` | `anthropic/claude-3.5-sonnet` | 5 | ❌ | ❌ |
 
-### Self-hosted NIM (air-gapped)
+### Nvidia NIM (free cloud)
 
-Run a NIM container locally, point Inspectra at it:
+Nvidia provides **free cloud API access** at [build.nvidia.com](https://build.nvidia.com) to dozens of production-grade models — Llama 3.3 70B, DeepSeek-R1, Mistral Large, Qwen, Phi, and more. No GPU, no Docker, no credit card to start.
+
+```bash
+# 1. Get a free API key at https://build.nvidia.com
+export NVIDIA_API_KEY=nvapi-...
+
+# 2. Review with a 70B model — free
+inspectra review --provider nvidia --model meta/llama-3.3-70b-instruct
+
+# Or try DeepSeek-R1 for deeper reasoning
+inspectra review --provider nvidia --model deepseek-ai/deepseek-r1
+```
+
+**Popular free models on Nvidia cloud:**
+
+| Model | Best for |
+|-------|----------|
+| `meta/llama-3.3-70b-instruct` | **Default — best balance for code review** |
+| `deepseek-ai/deepseek-r1` | Deep reasoning, complex bugs |
+| `mistralai/mistral-large-2411` | Fast, strong general-purpose |
+| `qwen/qwen2.5-coder-32b-instruct` | Code-specialized |
+| `microsoft/phi-4` | Lightweight, fast |
+
+Browse the full catalog at [build.nvidia.com](https://build.nvidia.com/models).
+
+### Self-hosted NIM (air-gapped, on-prem)
+
+For enterprises that need fully air-gapped reviews, run a NIM container locally:
 
 ```bash
 docker run --gpus all -p 8000:8000 nvcr.io/nim/meta/llama-3.3-70b-instruct:latest
@@ -314,7 +375,59 @@ jobs:
           category: inspectra
 ```
 
-### Cloud with OpenAI
+### Cloud with Nvidia NIM (free — no self-hosted runner needed)
+
+The easiest cloud option: free API key from [build.nvidia.com](https://build.nvidia.com), runs on GitHub-hosted runners, uses a 70B model.
+
+```yaml
+name: Inspectra Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: inspectra-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  inspectra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install 'inspectra==0.2.0'
+      - name: Run review
+        continue-on-error: true
+        run: |
+          inspectra review \
+            --provider nvidia \
+            --model meta/llama-3.3-70b-instruct \
+            --post-comment --inline \
+            --sarif inspectra.sarif \
+            --no-fail-on-high \
+            --pr ${{ github.event.pull_request.number }}
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+      - name: Upload SARIF
+        if: always() && hashFiles('inspectra.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: inspectra.sarif
+          category: inspectra
+```
+
+### Cloud with OpenAI (paid)
 
 ```yaml
 name: Inspectra Review
