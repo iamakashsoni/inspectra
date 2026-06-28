@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Two-pass review: cross-file consistency check.
 
 Phase 2 #25: after the per-chunk pass, run a SECOND pass that looks at all

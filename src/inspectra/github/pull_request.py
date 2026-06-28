@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Fetch pull request data from GitHub.
 
 Phase 1 change: `get_pr_metadata` now returns `head_sha`, which is required by

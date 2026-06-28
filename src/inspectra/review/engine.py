@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Review engine — orchestrates chunking, reviewing, and aggregating results.
 
 Phase 1: configurable concurrency (was hardcoded at 3).

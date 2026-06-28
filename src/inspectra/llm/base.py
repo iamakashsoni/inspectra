@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Abstract base class + request/response models for all LLM providers.
 
 Phase 1 change: replaces the old `review_code(prompt) -> str` interface with a

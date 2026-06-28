@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Tests for all five providers' wire-level behavior.
 
 Uses httpx.MockTransport to intercept HTTP calls so we don't need real

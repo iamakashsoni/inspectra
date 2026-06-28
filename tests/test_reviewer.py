@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Tests for the ChunkReviewer — uses a fake provider that returns canned JSON,
 verifies the retry loop kicks in on parse failure, and verifies the new
 rule_id field is parsed.

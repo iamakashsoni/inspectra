@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Caching wrapper for any LLM provider.
 
 Cache key includes all request fields that affect output (user_prompt,

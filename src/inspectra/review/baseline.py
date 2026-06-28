@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Baseline suppression — false-positive management.
 
 Phase 2 #30: lets users record "this finding is a false positive, don't

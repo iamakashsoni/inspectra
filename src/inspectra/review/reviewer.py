@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Core reviewer: sends a diff chunk to the LLM and parses the response.
 
 - Uses LLMRequest/LLMResponse interface with structured JSON output (schema-enforced)

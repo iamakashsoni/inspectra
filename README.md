@@ -8,7 +8,13 @@ Reviews your git diffs with LLMs — locally via **Ollama** (free, private) or v
 [![PyPI version](https://img.shields.io/pypi/v/inspectra.svg)](https://pypi.org/project/inspectra/)
 [![Python](https://img.shields.io/pypi/pyversions/inspectra.svg)](https://pypi.org/project/inspectra/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/iamakashsoni/inspectra/pulls)
 [![Code style: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
+---
+
+> **It reviews your code** — bugs, security vulnerabilities, performance issues, architectural concerns.
+> **It does not just find syntax errors** — it understands the surrounding code, the PR intent, and cross-file dependencies to give you precise, actionable suggestions.
 
 ---
 
@@ -20,14 +26,12 @@ Reviews your git diffs with LLMs — locally via **Ollama** (free, private) or v
 - [CLI Reference](#cli-reference)
 - [Configuration](#configuration)
 - [GitHub Actions](#github-actions)
-  - [Self-hosted with Ollama](#self-hosted-with-ollama-recommended)
-  - [Cloud with OpenAI](#cloud-with-openai)
-  - [Publishing to PyPI](#publishing-to-pypi)
 - [Phase 2 Features](#phase-2-features)
 - [Self-Hosted Runner Setup](#self-hosted-runner-setup)
 - [Architecture](#architecture)
 - [Development](#development)
 - [License](#license)
+- [Author](#author)
 
 ---
 
@@ -364,7 +368,7 @@ jobs:
 
 Inspectra uses GitHub OIDC trusted publishing — no API tokens needed.
 
-1. **Add the workflow** (already in `.github/workflows/publish.yml`):
+1. **The workflow is already in `.github/workflows/publish.yml`:**
 
 ```yaml
 name: Publish to PyPI
@@ -648,4 +652,35 @@ tests/                     # 153 tests (one file per module)
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Licensed under the **MIT License** — see [LICENSE](LICENSE).
+
+Copyright © 2025-2026 **Akash Soni**. All rights reserved.
+
+You may fork, modify, and distribute this project with proper attribution to the original author. You may **not**:
+- Claim authorship of the original work
+- Use the author's name to endorse derived products without explicit permission
+- Remove or alter the copyright notices in the source files
+
+Every source file includes a copyright header. Redistributions must retain these notices.
+
+---
+
+## Author
+
+
+
+**Akash Soni**
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/iamakashsoni/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/iamakashsoni)
+[![PyPI](https://img.shields.io/badge/PyPI-3775A9?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/inspectra/)
+
+*Building self-hosted developer tools that keep your code private.*
+
+
+
+---
+
+
+
+⭐ If this project helped you, consider giving it a star!

@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Post review comments to a GitHub Pull Request.
 
 Phase 1 change: `delete_previous_inspectra_comments` now ALSO deletes inline

@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Tests for Phase 2 prompt context blocks (#16, #17, #18, #22, #24)."""
 
 from inspectra.config.settings import ReviewCategories

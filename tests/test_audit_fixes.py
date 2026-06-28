@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Regression tests for every bug found in the production audit.
 
 Each test maps to a specific finding (C1-C6, H1-H6) and would have FAILED

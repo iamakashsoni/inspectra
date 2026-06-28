@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Disk-backed cache for LLM review responses.
 
 Phase 1: cache key signature unchanged on the surface — the prompt builder

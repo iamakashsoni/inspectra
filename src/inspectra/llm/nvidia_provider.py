@@ -1,3 +1,8 @@
+# Copyright (c) 2025-2026 Akash Soni
+#
+# Licensed under the MIT License. See LICENSE in the project root
+# for the full license text. You may not claim authorship of this work.
+
 """Nvidia NIM provider.
 
 Nvidia's integrate.api.nvidia.com endpoint is fully OpenAI-compatible —
