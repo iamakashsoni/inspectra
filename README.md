@@ -25,7 +25,7 @@ Reviews git diffs with LLMs · Posts actionable feedback on your GitHub PR · Wo
 - [CLI Reference](#cli-reference)
 - [Configuration](#configuration)
 - [GitHub Actions](#github-actions)
-- [Phase 2 Features](#phase-2-features)
+- [Features](#features)
 - [Architecture](#architecture)
 - [Development](#development)
 - [License](#license)
@@ -481,7 +481,7 @@ The `publish.yml` workflow runs automatically on the tag push and publishes to P
 
 ---
 
-## Phase 2 Features
+## Features
 
 ### File context
 
@@ -592,10 +592,10 @@ git diff
         └─► file filter (skip locks, minified, binary)
               └─► chunk_diff_by_file (model-aware size)
                     │
-                    ├─► [Phase 2] build_file_context() — read full file, ±20 line window
-                    ├─► [Phase 2] extract_changed_signatures() — for related-changes block
-                    ├─► [Phase 2] analyzer_registry.analyze_file() — Bandit/Semgrep/regex
-                    ├─► [Phase 2] get_language_rules() — Python/JS/Go antipatterns
+                    ├─► build_file_context() — read full file, ±20 line window
+                    ├─► extract_changed_signatures() — for related-changes block
+                    ├─► analyzer_registry.analyze_file() — Bandit/Semgrep/regex
+                    ├─► get_language_rules() — Python/JS/Go antipatterns
                     │
                     └─► ChunkReviewer.review()
                           │   ├── prompt includes: file context, PR intent,
@@ -605,9 +605,9 @@ git diff
                           │
                           └─► ReviewResult[]
                                 │
-                                ├─► [Phase 2] run_cross_file_review() — second LLM pass
+                                ├─► run_cross_file_review() — second LLM pass
                                 │
-                                ├─► [Phase 2] apply_baseline() — suppress false positives
+                                ├─► apply_baseline() — suppress false positives
                                 │
                                 └─► output
                                       ├── Console (Rich tables + panels)
@@ -700,7 +700,7 @@ Every source file includes a copyright header. Redistributions must retain these
 
 ## Author
 
-
+<div align="center">
 
 **Akash Soni**
 
@@ -710,10 +710,6 @@ Every source file includes a copyright header. Redistributions must retain these
 
 *Building self-hosted developer tools that keep your code private.*
 
-
-
----
-
-
-
 ⭐ If this project helped you, consider giving it a star!
+
+</div>
