@@ -3,23 +3,23 @@ name: Publish to PyPI
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*' # Triggers whenever you push a tag like v0.1.1, v1.0.0, etc.
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     environment: pypi
-    timeout-minutes: 10
+
     permissions:
-      id-token: write
-      contents: read
+      id-token: write   # Required for trusted publishing (OIDC)
+      contents: read    # Required to check out code safely
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
