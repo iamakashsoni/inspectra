@@ -4,16 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "inspectra"
-version = "0.1.1"
-description = "AI-powered code review engine for pull requests"
+version = "0.2.0"
+description = "AI-powered self-hosted code reviewer for pull requests"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
-authors = [{ name = "Akash Soni", email="akash.soni.3101@gmail.com" }]
-maintainers = [{ name = "Akash Soni", email="akash.soni.3101@gmail.com" }]
-keywords = ["code-review", "ai", "llm", "github", "devtools"]
+authors = [{ name = "Akash Soni", email = "akash.soni.3101@gmail.com" }]
+keywords = ["code-review", "ai", "llm", "github", "devtools", "self-hosted"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.11",
@@ -32,11 +31,13 @@ dependencies = [
     "PyGithub>=2.2.0",
     "PyYAML>=6.0.1",
     "tiktoken>=0.6.0",
-    "openai>=1.14.0",
-    "anthropic>=0.20.0",
 ]
 
 [project.optional-dependencies]
+# Cloud providers are optional — self-hosted Ollama users don't need them
+openai = ["openai>=1.14.0"]
+anthropic = ["anthropic>=0.20.0"]
+all = ["openai>=1.14.0", "anthropic>=0.20.0"]
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
@@ -48,13 +49,9 @@ dev = [
 [project.scripts]
 inspectra = "inspectra.cli:app"
 
-
 [project.urls]
 Homepage = "https://github.com/iamakashsoni/inspectra"
 Repository = "https://github.com/iamakashsoni/inspectra"
-Documentation = "https://github.com/iamakashsoni/inspectra#readme"
-"Bug Tracker" = "https://github.com/iamakashsoni/inspectra/issues"
-Changelog = "https://github.com/iamakashsoni/inspectra/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -62,7 +59,6 @@ where = ["src"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-addopts = "--cov=inspectra --cov-report=term-missing"
 
 [tool.ruff]
 line-length = 100

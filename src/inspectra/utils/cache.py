@@ -1,9 +1,8 @@
-"""
-Simple file-based cache for LLM review responses.
+"""Disk-backed cache for LLM review responses.
 
-When the same diff hunk is seen again (same sha256 hash), the cached
-response is returned without calling the LLM. Useful for incremental
-reviews where most files haven't changed.
+Phase 1: cache key signature unchanged on the surface — the prompt builder
+stamps PROMPT_VERSION into the prompt text, so a prompt bump invalidates
+all entries automatically without changing this module.
 """
 
 from __future__ import annotations
@@ -16,8 +15,8 @@ from pathlib import Path
 from inspectra.utils.logger import logger
 
 _DEFAULT_CACHE_DIR = Path(".inspectra_cache")
-_CACHE_VERSION = 1
-_DEFAULT_TTL_SECONDS = 60 * 60 * 24 * 7  # 7 days
+_CACHE_VERSION = 2                          # Bumped for v2 (new key semantics)
+_DEFAULT_TTL_SECONDS = 60 * 60 * 24 * 7     # 7 days
 
 
 class ReviewCache:
@@ -43,41 +42,40 @@ class ReviewCache:
         return self.cache_dir / f"{key}.json"
 
     @staticmethod
-    def make_key(file_path: str, diff_text: str) -> str:
-        """Derive a stable cache key from the file path and diff content."""
-        payload = f"{file_path}::{diff_text}"
-        return hashlib.sha256(payload.encode()).hexdigest()
+    def make_key(kind: str, payload: str) -> str:
+        """Derive a stable cache key from a kind tag + payload string."""
+        data = f"{kind}::{payload}"
+        return hashlib.sha256(data.encode()).hexdigest()
 
     def get(self, key: str) -> str | None:
-        """Return cached response or None if missing / expired."""
         path = self._key_path(key)
         if not path.exists():
             self._misses += 1
             return None
-
         try:
             data = json.loads(path.read_text())
         except (json.JSONDecodeError, OSError):
             self._misses += 1
             return None
-
         if data.get("version") != _CACHE_VERSION:
             self._misses += 1
             return None
-
         age = time.time() - data.get("timestamp", 0)
         if age > self.ttl_seconds:
             path.unlink(missing_ok=True)
             self._misses += 1
             logger.debug("Cache expired for key %s", key[:8])
             return None
-
         self._hits += 1
-        logger.debug("Cache hit for key %s", key[:8])
         return data.get("response")
 
     def set(self, key: str, response: str) -> None:
-        """Store a response in the cache."""
+        """Store a response in the cache.
+
+        H2 fix: writes to a temp file first, then atomically renames. A crash
+        mid-write no longer leaves a corrupted cache entry that would cause
+        a permanent cache miss for that key.
+        """
         self._ensure_dir()
         path = self._key_path(key)
         data = {
@@ -85,10 +83,15 @@ class ReviewCache:
             "timestamp": time.time(),
             "response": response,
         }
-        path.write_text(json.dumps(data))
+        # H2 fix: atomic write via temp file + rename
+        tmp_path = path.with_suffix(".json.tmp")
+        tmp_path.write_text(json.dumps(data), encoding="utf-8")
+        # os.rename is atomic on POSIX (same filesystem). On Windows, need to
+        # handle existing target — os.replace does that cross-platform.
+        import os
+        os.replace(tmp_path, path)
 
     def clear(self) -> int:
-        """Delete all cache entries. Returns number of files removed."""
         if not self.cache_dir.exists():
             return 0
         removed = 0

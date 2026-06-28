@@ -1,4 +1,4 @@
-"""Write review output to a Markdown file."""
+"""Write review output to a Markdown file (delegates to review/formatter.py)."""
 
 from __future__ import annotations
 
@@ -14,7 +14,6 @@ def write_markdown_report(
     output_path: Path | str = "inspectra-review.md",
     pr_summary: str = "",
 ) -> Path:
-    """Write the full review to a Markdown file and return the path."""
     output_path = Path(output_path)
     content = results_to_markdown(results, pr_summary)
     output_path.write_text(content, encoding="utf-8")

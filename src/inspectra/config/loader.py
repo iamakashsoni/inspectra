@@ -1,4 +1,4 @@
-"""Load and merge .inspectra.yml config with environment settings."""
+"""Load and merge .inspectra.yml config with environment + CLI overrides."""
 
 from pathlib import Path
 from typing import Any
@@ -21,13 +21,7 @@ def _find_config_file(start: Path | None = None) -> Path | None:
 
 
 def load_settings(config_path: Path | None = None, **overrides: Any) -> InspectraSettings:
-    """
-    Load settings by merging (in priority order):
-      1. Defaults
-      2. .inspectra.yml file
-      3. Environment variables
-      4. Explicit CLI overrides
-    """
+    """Merge defaults ← YAML ← env ← CLI overrides."""
     file_data: dict[str, Any] = {}
 
     resolved = config_path or _find_config_file()
@@ -36,7 +30,6 @@ def load_settings(config_path: Path | None = None, **overrides: Any) -> Inspectr
             raw = yaml.safe_load(f) or {}
         file_data = _normalize_yaml(raw)
 
-    # Merge: file values first, then CLI overrides win
     merged = {**file_data, **{k: v for k, v in overrides.items() if v is not None}}
     return InspectraSettings(**merged)
 
@@ -44,7 +37,6 @@ def load_settings(config_path: Path | None = None, **overrides: Any) -> Inspectr
 def _normalize_yaml(raw: dict[str, Any]) -> dict[str, Any]:
     """Flatten nested YAML keys into a form InspectraSettings understands."""
     out: dict[str, Any] = {}
-
     for key, value in raw.items():
         if key == "ollama" and isinstance(value, dict):
             out["ollama"] = OllamaConfig(**value)
@@ -52,5 +44,4 @@ def _normalize_yaml(raw: dict[str, Any]) -> dict[str, Any]:
             out["review"] = ReviewCategories(**value)
         else:
             out[key] = value
-
     return out

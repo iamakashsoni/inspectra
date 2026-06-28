@@ -1,85 +1,25 @@
-# ── Python ────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-*.pyd
-
-# Distribution / packaging
-dist/
+.Python
 build/
+dist/
 *.egg-info/
+.installed.cfg
 *.egg
-MANIFEST
-.eggs/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-
-# Virtual environments
 .venv/
 venv/
 env/
-ENV/
-.env
-.env.*
-!.env.example
-
-# ── Testing ───────────────────────────────────────────────
-.pytest_cache/
+.tox/
 .coverage
 .coverage.*
-coverage.xml
-coverage/
 htmlcov/
-nosetests.xml
-*.cover
-*.py,cover
-
-# ── Type checking ─────────────────────────────────────────
+.pytest_cache/
 .mypy_cache/
-.dmypy.json
-dmypy.json
-.pytype/
-
-# ── Linting ───────────────────────────────────────────────
 .ruff_cache/
-
-# ── Inspectra specific ────────────────────────────────────
-.inspectra_cache/
-inspectra-review.md
-inspectra.sarif
-
-# ── IDE / editors ─────────────────────────────────────────
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-
-# ── Jupyter ───────────────────────────────────────────────
-.ipynb_checkpoints
-*.ipynb
-
-# ── Secrets / credentials ─────────────────────────────────
+.instpectra_cache/
 .env
-*.pem
-*.key
-secrets.yml
-secrets.yaml
-
-# ── OS ────────────────────────────────────────────────────
+*.sarif
+inspectra-review.md
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# ── Docs build ────────────────────────────────────────────
-docs/_build/
-docs/site/
-site/

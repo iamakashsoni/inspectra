@@ -1,17 +1,20 @@
-"""Token counting utilities for prompt size management."""
+"""Token counting utilities — Phase 1: memoized via lru_cache."""
 
 from __future__ import annotations
 
+from functools import lru_cache
+
 try:
     import tiktoken
-
     _ENCODER = tiktoken.get_encoding("cl100k_base")
 
+    @lru_cache(maxsize=4096)
     def count_tokens(text: str) -> int:
+        """Token count, memoized per-process. Safe to call repeatedly on same text."""
         return len(_ENCODER.encode(text))
 
 except Exception:
-    # Fallback: rough character-based estimate (1 token ≈ 4 chars)
+    @lru_cache(maxsize=4096)
     def count_tokens(text: str) -> int:  # type: ignore[misc]
         return max(1, len(text) // 4)
 
@@ -24,8 +27,6 @@ def truncate_to_budget(text: str, budget: int) -> str:
     """Truncate text so it fits within the token budget."""
     if fits_in_budget(text, budget):
         return text
-
-    # Binary search for the right split point
     lines = text.splitlines(keepends=True)
     lo, hi = 0, len(lines)
     while lo < hi:
@@ -35,6 +36,4 @@ def truncate_to_budget(text: str, budget: int) -> str:
             lo = mid
         else:
             hi = mid - 1
-
-    truncated = "".join(lines[:lo])
-    return truncated + f"\n\n... [truncated — exceeded {budget} token budget]"
+    return "".join(lines[:lo]) + f"\n\n... [truncated — exceeded {budget} token budget]"

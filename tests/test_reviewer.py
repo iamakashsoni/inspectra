@@ -1,84 +1,104 @@
-"""Tests for the chunk reviewer and response parser."""
+"""Tests for the ChunkReviewer — uses a fake provider that returns canned JSON,
+verifies the retry loop kicks in on parse failure, and verifies the new
+rule_id field is parsed.
+"""
 
+import asyncio
 import json
+from typing import List
 
-import pytest
-
-from inspectra.llm.base import BaseLLMProvider
-from inspectra.review.reviewer import ChunkReviewer, _strip_fences
+from inspectra.config.settings import ReviewCategories
+from inspectra.llm.base import BaseLLMProvider, LLMRequest, LLMResponse
+from inspectra.review.reviewer import ChunkReviewer
 from inspectra.review.severity import Severity
 
 
-class MockProvider(BaseLLMProvider):
-    def __init__(self, response: str):
-        self._response = response
+class FakeProvider(BaseLLMProvider):
+    """Returns canned responses in sequence — for testing the retry loop."""
 
-    async def review_code(self, prompt: str) -> str:
-        return self._response
+    def __init__(self, responses: List[str]):
+        super().__init__(system_prompt="test", model="fake")
+        self.responses = responses
+        self.calls = 0
+
+    async def complete(self, request: LLMRequest) -> LLMResponse:
+        resp = self.responses[self.calls]
+        self.calls += 1
+        return LLMResponse(text=resp, finish_reason="stop")
 
 
 VALID_RESPONSE = json.dumps({
-    "summary": "The code has a SQL injection vulnerability.",
+    "summary": "Adds a SQL query with a vulnerability.",
     "issues": [
         {
             "title": "SQL Injection",
             "severity": "critical",
             "category": "Security",
-            "explanation": "User input directly concatenated into SQL query.",
-            "suggested_fix": "Use parameterized queries.",
+            "explanation": "Direct string interpolation into SQL.",
+            "suggested_fix": "cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))",
             "file_path": "auth/service.py",
             "line_number": 42,
+            "rule_id": "SQL_INJECTION",
         }
-    ],
+    ]
 })
 
 
-@pytest.mark.asyncio
-async def test_reviewer_parses_valid_json():
-    provider = MockProvider(VALID_RESPONSE)
-    reviewer = ChunkReviewer(provider)
-    result = await reviewer.review("auth/service.py", "some diff")
-
+def test_review_parses_valid_response():
+    provider = FakeProvider([VALID_RESPONSE])
+    reviewer = ChunkReviewer(provider=provider, categories=ReviewCategories())
+    result = asyncio.run(reviewer.review("auth/service.py", "+def get_user(conn, user_id): ..."))
     assert result.file_path == "auth/service.py"
     assert len(result.issues) == 1
-    assert result.issues[0].severity == Severity.CRITICAL
-    assert result.issues[0].title == "SQL Injection"
+    issue = result.issues[0]
+    assert issue.title == "SQL Injection"
+    assert issue.severity == Severity.CRITICAL
+    assert issue.rule_id == "SQL_INJECTION"
+    assert issue.line_number == 42
 
 
-@pytest.mark.asyncio
-async def test_reviewer_handles_invalid_json():
-    provider = MockProvider("This is not JSON at all.")
-    reviewer = ChunkReviewer(provider)
-    result = await reviewer.review("foo.py", "diff")
-
-    assert result.file_path == "foo.py"
-    assert result.issues == []
-
-
-@pytest.mark.asyncio
-async def test_reviewer_handles_fenced_json():
-    fenced = f"```json\n{VALID_RESPONSE}\n```"
-    provider = MockProvider(fenced)
-    reviewer = ChunkReviewer(provider)
-    result = await reviewer.review("auth/service.py", "diff")
-
+def test_review_retries_on_invalid_json():
+    """First call returns garbage, second returns valid JSON — should succeed."""
+    provider = FakeProvider(["this is not json", VALID_RESPONSE])
+    reviewer = ChunkReviewer(provider=provider, categories=ReviewCategories(), max_retries=3)
+    result = asyncio.run(reviewer.review("auth/service.py", "+pass"))
     assert len(result.issues) == 1
+    assert provider.calls == 2  # First call failed, second succeeded
 
 
-def test_strip_fences():
-    assert _strip_fences("```json\n{}\n```") == "{}"
-    assert _strip_fences("```\n{}\n```") == "{}"
-    assert _strip_fences("{}") == "{}"
+def test_review_exhausts_retries():
+    """All calls return invalid JSON — should return a failure ReviewResult."""
+    provider = FakeProvider(["bad", "worse", "still bad"])
+    reviewer = ChunkReviewer(provider=provider, categories=ReviewCategories(), max_retries=3)
+    result = asyncio.run(reviewer.review("foo.py", "+pass"))
+    assert result.has_issues is False
+    assert "Failed to review" in result.summary
+    assert provider.calls == 3
 
 
-@pytest.mark.asyncio
-async def test_reviewer_handles_provider_exception():
-    class FailingProvider(BaseLLMProvider):
-        async def review_code(self, prompt: str) -> str:
-            raise RuntimeError("LLM is down")
-
-    reviewer = ChunkReviewer(FailingProvider())
-    result = await reviewer.review("crash.py", "diff")
-
-    assert "Review failed" in result.summary
+def test_review_handles_empty_issues():
+    """LLM returns no issues — should produce a clean result with empty issues list."""
+    empty = json.dumps({"summary": "Looks good.", "issues": []})
+    provider = FakeProvider([empty])
+    reviewer = ChunkReviewer(provider=provider, categories=ReviewCategories())
+    result = asyncio.run(reviewer.review("foo.py", "+pass"))
     assert result.issues == []
+    assert result.summary == "Looks good."
+
+
+def test_review_falls_back_on_missing_rule_id():
+    """Issues without rule_id get an empty string (not a crash)."""
+    response = json.dumps({
+        "summary": "ok",
+        "issues": [{
+            "title": "Bad", "severity": "low", "category": "General",
+            "explanation": "vague", "suggested_fix": "",
+            "file_path": "foo.py", "line_number": 1,
+            # rule_id intentionally omitted
+        }]
+    })
+    provider = FakeProvider([response])
+    reviewer = ChunkReviewer(provider=provider, categories=ReviewCategories())
+    result = asyncio.run(reviewer.review("foo.py", "+pass"))
+    assert len(result.issues) == 1
+    assert result.issues[0].rule_id == ""

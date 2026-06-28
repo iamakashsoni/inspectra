@@ -1,8 +1,3 @@
-"""
-Inspectra — AI-Powered Code Review Engine.
+"""Inspectra v2 — self-hosted AI code reviewer."""
 
-Review pull requests intelligently using LLMs.
-"""
-
-__version__ = "0.1.0"
-__author__ = "Inspectra Contributors"
+__version__ = "0.2.0"

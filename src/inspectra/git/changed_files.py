@@ -15,25 +15,16 @@ def get_reviewable_files(
     staged_only: bool = False,
     exclude_patterns: list[str] | None = None,
 ) -> dict[str, str]:
-    """
-    Return a filtered dict of {file_path: diff_text} ready for review.
-
-    If `raw_diff` is provided it is used directly (e.g. from GitHub API).
-    Otherwise a local `git diff HEAD` is run.
-    """
+    """Return a filtered dict of {file_path: diff_text} ready for review."""
     if raw_diff is None:
         raw_diff = get_local_diff(repo_path=repo_path, staged_only=staged_only)
-
     if not raw_diff.strip():
         logger.info("No diff found — nothing to review.")
         return {}
-
     parsed = parse_diff(raw_diff)
     logger.debug("Parsed %d changed files", len(parsed))
-
     filtered = filter_files(parsed, extra_patterns=exclude_patterns)
     skipped = len(parsed) - len(filtered)
     if skipped:
         logger.debug("Skipped %d file(s) (generated / binary / excluded)", skipped)
-
     return filtered

@@ -1,13 +1,11 @@
-# .inspectra.yml — Inspectra configuration
-# Place this file in the root of your repository.
+# .inspectra.yml — Inspectra v2 configuration (self-hosted default)
+# Docs: https://github.com/iamakashsoni/inspectra
 
-# LLM provider: ollama | openai | anthropic
+# LLM provider: ollama | openai | anthropic | nvidia | openrouter
 provider: ollama
-
-# Model name (provider-specific)
 model: qwen2.5-coder:14b
 
-# Ollama connection settings (only used when provider = ollama)
+# Ollama (only used when provider = ollama)
 ollama:
   host: http://localhost:11434
   timeout: 300
@@ -39,3 +37,10 @@ max_chunk_tokens: 3000
 
 # LLM temperature (lower = more deterministic)
 temperature: 0.2
+
+# Concurrency: 0 = auto-pick per provider
+# (Ollama=3, OpenAI=10, Anthropic=8, Nvidia=5, OpenRouter=5)
+review_concurrency: 0
+
+# Post inline comments at issue lines when reviewing a PR
+inline_comments: true

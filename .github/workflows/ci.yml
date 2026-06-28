@@ -4,10 +4,19 @@ on:
   push:
     branches: [main, develop]
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+
+# Cancel in-flight runs when a new commit lands on the same branch
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -15,6 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1                    # was: default (full history) — wasteful
 
       - uses: actions/setup-python@v5
         with:
@@ -29,8 +40,13 @@ jobs:
       - name: Run tests
         run: pytest --cov=inspectra --cov-report=xml -q
 
+      # NEW in v2: dogfooding — dry-run Inspectra on its own diff
+      - name: Inspectra self-review (dry-run)
+        run: inspectra review --dry-run --no-pr-summary --no-fail-on-high
+        continue-on-error: true
+
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
-        continue-on-error: true   # don't fail CI if codecov is down
+        continue-on-error: true

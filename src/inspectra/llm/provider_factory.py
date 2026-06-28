@@ -1,4 +1,8 @@
-"""Factory that instantiates the correct LLM provider from settings."""
+"""Factory that instantiates the correct LLM provider from settings.
+
+Phase 1: now supports 5 providers (added Nvidia + OpenRouter). All
+OpenAI-compatible providers share the same code path, just different defaults.
+"""
 
 from __future__ import annotations
 
@@ -6,6 +10,7 @@ from pathlib import Path
 
 from inspectra.config.settings import InspectraSettings, LLMProvider
 from inspectra.llm.base import BaseLLMProvider
+from inspectra.review.prompts import SYSTEM_PROMPT
 
 
 def build_provider(
@@ -13,17 +18,7 @@ def build_provider(
     use_cache: bool = False,
     cache_dir: Path | str | None = None,
 ) -> BaseLLMProvider:
-    """
-    Instantiate and return the configured LLM provider.
-
-    Args:
-        settings:   Resolved InspectraSettings.
-        use_cache:  If True, wrap the provider in a CachedProvider.
-        cache_dir:  Override the default cache directory.
-
-    Raises:
-        ValueError: If the required API key is missing or provider is unknown.
-    """
+    """Instantiate and return the configured LLM provider."""
     model = settings.model_for_provider()
 
     match settings.provider:
@@ -33,32 +28,51 @@ def build_provider(
                 model=model,
                 host=settings.ollama.host,
                 timeout=settings.ollama.timeout,
+                system_prompt=SYSTEM_PROMPT,
             )
 
         case LLMProvider.OPENAI:
             if not settings.openai_api_key:
-                raise ValueError(
-                    "OPENAI_API_KEY is not set. "
-                    "Export it or add it to your .env file."
-                )
+                raise ValueError("OPENAI_API_KEY is not set.")
             from inspectra.llm.openai_provider import OpenAIProvider
             provider = OpenAIProvider(
                 api_key=settings.openai_api_key,
                 model=model,
-                temperature=settings.temperature,
+                base_url=settings.openai_base_url,
+                system_prompt=SYSTEM_PROMPT,
             )
 
         case LLMProvider.ANTHROPIC:
             if not settings.anthropic_api_key:
-                raise ValueError(
-                    "ANTHROPIC_API_KEY is not set. "
-                    "Export it or add it to your .env file."
-                )
+                raise ValueError("ANTHROPIC_API_KEY is not set.")
             from inspectra.llm.anthropic_provider import AnthropicProvider
             provider = AnthropicProvider(
                 api_key=settings.anthropic_api_key,
                 model=model,
-                temperature=settings.temperature,
+                base_url=settings.anthropic_base_url,
+                system_prompt=SYSTEM_PROMPT,
+            )
+
+        case LLMProvider.NVIDIA:
+            if not settings.nvidia_api_key:
+                raise ValueError("NVIDIA_API_KEY is not set.")
+            from inspectra.llm.nvidia_provider import NvidiaProvider
+            provider = NvidiaProvider(
+                api_key=settings.nvidia_api_key,
+                model=model,
+                base_url=settings.nvidia_base_url,
+                system_prompt=SYSTEM_PROMPT,
+            )
+
+        case LLMProvider.OPENROUTER:
+            if not settings.openrouter_api_key:
+                raise ValueError("OPENROUTER_API_KEY is not set.")
+            from inspectra.llm.openrouter_provider import OpenRouterProvider
+            provider = OpenRouterProvider(
+                api_key=settings.openrouter_api_key,
+                model=model,
+                base_url=settings.openrouter_base_url,
+                system_prompt=SYSTEM_PROMPT,
             )
 
         case _:

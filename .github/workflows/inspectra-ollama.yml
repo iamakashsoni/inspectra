@@ -2,16 +2,24 @@ name: Inspectra Review (Ollama)
 
 on:
   pull_request:
-    branches:
-      - main
-      - master
-      - UAT
-      - develop
+    types: [opened, synchronize, reopened]
+    branches: [main, master, UAT, develop]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.github/**'
+      - '**/*.lock'
+  workflow_dispatch:                       # NEW: manual re-review trigger
+
+# Cancel previous review runs when a new commit lands on the same PR
+concurrency:
+  group: inspectra-ollama-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   inspectra:
     runs-on: self-hosted
-
+    timeout-minutes: 15                    # NEW: don't let stuck Ollama hold the runner forever
     permissions:
       pull-requests: write
       contents: read
@@ -19,31 +27,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1                   # was: 0 (full clone) — wasteful, Inspectra uses the API diff
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install Inspectra
-        run: pip install inspectra --upgrade
+      - name: Install Inspectra (pinned)
+        run: pip install 'inspectra==${{ vars.INSPECTRA_VERSION || "0.2.0" }}'
 
-      - name: Start Ollama (if not already running)
+      - name: Ensure Ollama is up and model is pulled
         run: |
-          ollama serve &>/dev/null &
-          sleep 3
-
-      - name: Pull model (if not cached)
-        run: ollama pull qwen2.5-coder:14b
+          # Start Ollama if not already running
+          curl -sf http://localhost:11434/api/tags >/dev/null 2>&1 || ollama serve &>/dev/null &
+          # Wait for it (max 60s)
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:11434/api/tags >/dev/null 2>&1 && break
+            sleep 1
+          done
+          # Pull model only if missing (skips network hit if already pulled)
+          ollama list | grep -q 'qwen2.5-coder:14b' || ollama pull qwen2.5-coder:14b
 
       - name: Run Inspectra Review
+        continue-on-error: true            # NEW: fail open — don't block PRs if Ollama OOMs
         run: |
           inspectra review \
             --provider ollama \
             --model qwen2.5-coder:14b \
             --post-comment \
+            --inline \
+            --sarif inspectra.sarif \
+            --cache \
             --no-fail-on-high \
             --pr ${{ github.event.pull_request.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always() && hashFiles('inspectra.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: inspectra.sarif
+          category: inspectra

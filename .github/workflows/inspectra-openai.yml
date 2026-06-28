@@ -2,11 +2,21 @@ name: Inspectra Review (OpenAI)
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.github/**'
+  workflow_dispatch:
+
+concurrency:
+  group: inspectra-openai-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   inspectra:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
     permissions:
       pull-requests: write
       contents: read
@@ -14,23 +24,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install Inspectra
-        run: pip install inspectra
+        run: pip install 'inspectra==${{ vars.INSPECTRA_VERSION || "0.2.0" }}'
 
       - name: Run review
+        continue-on-error: true
         run: |
           inspectra review \
             --provider openai \
             --model gpt-4o-mini \
             --post-comment \
+            --inline \
+            --sarif inspectra.sarif \
+            --no-fail-on-high \
             --pr ${{ github.event.pull_request.number }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always() && hashFiles('inspectra.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: inspectra.sarif
+          category: inspectra-openai

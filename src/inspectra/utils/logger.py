@@ -21,5 +21,4 @@ def get_logger(name: str = "inspectra", verbose: bool = False) -> logging.Logger
     return logger
 
 
-# Module-level default logger (reconfigured when verbose flag is known)
 logger = get_logger()

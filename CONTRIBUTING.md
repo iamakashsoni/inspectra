@@ -120,3 +120,50 @@ Use GitHub Issues. Please include:
 - The command you ran
 - The full error output
 - Your `.inspectra.yml` (redact any secrets)
+
+---
+
+## Phase 2: Adding new analyzers
+
+1. Subclass `BaseAnalyzer` in `src/inspectra/review/analyzers/`
+2. Set `name` and `supported_languages` as class attributes
+3. Implement `analyze(file_path, full_content, diff_text) -> list[AnalyzerFinding]`
+4. Register in `build_default_registry()` (in `registry.py`)
+
+```python
+from inspectra.review.analyzers.base import AnalyzerFinding, BaseAnalyzer
+
+class MyAnalyzer(BaseAnalyzer):
+    name = "my-analyzer"
+    supported_languages = ["python"]
+
+    def analyze(self, file_path, full_content, diff_text):
+        return [AnalyzerFinding(
+            rule_id="MINE/R001",
+            severity="medium",
+            category="Bugs",
+            title="My custom finding",
+            explanation="...",
+            file_path=file_path,
+            line_number=42,
+            analyzer_name=self.name,
+        )]
+```
+
+## Phase 2: Adding new LLM providers
+
+For OpenAI-compatible providers (Together, Groq, Anyscale, etc.):
+
+```python
+from inspectra.llm.openai_compatible import OpenAICompatibleProvider
+
+class TogetherProvider(OpenAICompatibleProvider):
+    def __init__(self, *, api_key, model="meta-llama/Llama-3-70b-chat-hf", **kwargs):
+        super().__init__(
+            api_key=api_key, model=model,
+            base_url="https://api.together.xyz/v1",
+            **kwargs,
+        )
+```
+
+Then add the provider to the `LLMProvider` enum in `config/settings.py` and a branch in `llm/provider_factory.py`.
