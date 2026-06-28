@@ -2,32 +2,30 @@
 
 **Self-hosted AI code reviewer for pull requests.**
 
-Reviews your git diffs with LLMs — locally via **Ollama** (free, private) or via **OpenAI / Anthropic / Nvidia NIM / OpenRouter** — and posts structured, actionable feedback directly on your GitHub PR.
+Reviews git diffs with LLMs · Posts actionable feedback on your GitHub PR · Works with 5 providers
 
 [![CI](https://github.com/iamakashsoni/inspectra/actions/workflows/ci.yml/badge.svg)](https://github.com/iamakashsoni/inspectra/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/inspectra.svg)](https://pypi.org/project/inspectra/)
 [![Python](https://img.shields.io/pypi/pyversions/inspectra.svg)](https://pypi.org/project/inspectra/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/iamakashsoni/inspectra/pulls)
-[![Code style: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 ---
 
 > **It reviews your code** — bugs, security vulnerabilities, performance issues, architectural concerns.
-> **It does not just find syntax errors** — it understands the surrounding code, the PR intent, and cross-file dependencies to give you precise, actionable suggestions.
+> **It does not just find syntax errors** — it understands the surrounding code, the PR intent, and cross-file dependencies to give precise, actionable suggestions.
 
 ---
 
 ## Table of Contents
 
-- [Quick Start](#quick-start)
 - [How It Works](#how-it-works)
 - [LLM Providers](#llm-providers)
+- [Quick Start](#quick-start)
 - [CLI Reference](#cli-reference)
 - [Configuration](#configuration)
 - [GitHub Actions](#github-actions)
 - [Phase 2 Features](#phase-2-features)
-- [Self-Hosted Runner Setup](#self-hosted-runner-setup)
 - [Architecture](#architecture)
 - [Development](#development)
 - [License](#license)
@@ -35,82 +33,10 @@ Reviews your git diffs with LLMs — locally via **Ollama** (free, private) or v
 
 ---
 
-## Quick Start
-
-### Install
-
-```bash
-pip install inspectra
-```
-
-### Option A — Nvidia NIM (free cloud, fastest start)
-
-Get a free API key at [build.nvidia.com](https://build.nvidia.com), then:
-
-```bash
-export NVIDIA_API_KEY=nvapi-...
-inspectra review --provider nvidia --model meta/llama-3.3-70b-instruct
-```
-
-No GPU, no Docker, no local setup. Uses a 70B model for free.
-
-### Option B — Ollama (free, fully local, private)
-
-```bash
-# Install and start Ollama
-curl -fsSL https://ollama.com/install.sh | sh
-ollama serve &
-ollama pull qwen2.5-coder:14b
-
-# Review your uncommitted changes
-inspectra review
-```
-
-### Option C — OpenAI / Anthropic (paid cloud)
-
-```bash
-# OpenAI
-export OPENAI_API_KEY=sk-...
-inspectra review --provider openai --model gpt-4o-mini
-
-# Anthropic
-export ANTHROPIC_API_KEY=sk-ant-...
-inspectra review --provider anthropic --model claude-sonnet-4-20250514
-```
-
-### Review a GitHub PR
-
-```bash
-export GITHUB_TOKEN=ghp_...
-export GITHUB_REPOSITORY=myorg/myrepo
-
-inspectra review --provider nvidia --pr 42 --post-comment
-```
-
----
-
-## Get a free Nvidia API key
-
-Nvidia offers **free cloud access** to production-grade models (Llama 3.3 70B, DeepSeek-R1, Mistral, Qwen, Phi, and more) via [build.nvidia.com](https://build.nvidia.com) — no GPU or Docker required.
-
-1. Open [build.nvidia.com](https://build.nvidia.com)
-2. Sign in with an Nvidia account → **Get API Key** (starts with `nvapi-`)
-3. Pick a model from the catalog (e.g. `meta/llama-3.3-70b-instruct`)
-4. Review:
-
-```bash
-export NVIDIA_API_KEY=nvapi-...
-inspectra review --provider nvidia --model meta/llama-3.3-70b-instruct
-```
-
-This is the easiest way to get high-quality reviews without running Ollama locally or paying for OpenAI/Anthropic.
-
----
-
 ## How It Works
 
 ```
-$ inspectra review --provider ollama --post-comment --pr 42
+$ inspectra review --provider nvidia --post-comment --pr 42
 
 Found 3 reviewable file(s).
 
@@ -146,30 +72,31 @@ Inspectra:
 
 Five providers, one interface. Switch with `--provider`, no code changes.
 
-| Provider | Default model | Default concurrency | Free | Private |
-|----------|---------------|---------------------|:----:|:-------:|
-| `ollama` | `qwen2.5-coder:14b` | 3 | ✅ | ✅ |
-| `nvidia` | `meta/llama-3.3-70b-instruct` | 5 | ✅ | ✅ (self-hosted NIM) |
-| `openai` | `gpt-4o-mini` | 10 | ❌ | ❌ |
-| `anthropic` | `claude-sonnet-4-20250514` | 8 | ❌ | ❌ |
-| `openrouter` | `anthropic/claude-3.5-sonnet` | 5 | ❌ | ❌ |
+| Provider | Default model | Concurrency | Free | Private | Setup |
+|----------|---------------|:-----------:|:----:|:-------:|-------|
+| `ollama` | `qwen2.5-coder:14b` | 3 | ✅ | ✅ | Local install |
+| `nvidia` | `meta/llama-3.3-70b-instruct` | 5 | ✅ | ✅* | Free API key |
+| `openai` | `gpt-4o-mini` | 10 | ❌ | ❌ | Paid API key |
+| `anthropic` | `claude-sonnet-4-20250514` | 8 | ❌ | ❌ | Paid API key |
+| `openrouter` | `anthropic/claude-3.5-sonnet` | 5 | ❌ | ❌ | Paid API key |
 
-### Nvidia NIM (free cloud)
+\* Nvidia cloud is private to your account; self-hosted NIM is fully air-gapped.
 
-Nvidia provides **free cloud API access** at [build.nvidia.com](https://build.nvidia.com) to dozens of production-grade models — Llama 3.3 70B, DeepSeek-R1, Mistral Large, Qwen, Phi, and more. No GPU, no Docker, no credit card to start.
+### Nvidia NIM (free cloud — recommended)
 
+Free cloud access to production-grade models at [build.nvidia.com](https://build.nvidia.com) — no GPU or Docker needed.
+
+**Step 1 — Get a free API key:**
+1. Open [build.nvidia.com](https://build.nvidia.com)
+2. Sign in → **Get API Key** (starts with `nvapi-`)
+
+**Step 2 — Review:**
 ```bash
-# 1. Get a free API key at https://build.nvidia.com
 export NVIDIA_API_KEY=nvapi-...
-
-# 2. Review with a 70B model — free
 inspectra review --provider nvidia --model meta/llama-3.3-70b-instruct
-
-# Or try DeepSeek-R1 for deeper reasoning
-inspectra review --provider nvidia --model deepseek-ai/deepseek-r1
 ```
 
-**Popular free models on Nvidia cloud:**
+**Popular free models:**
 
 | Model | Best for |
 |-------|----------|
@@ -179,7 +106,48 @@ inspectra review --provider nvidia --model deepseek-ai/deepseek-r1
 | `qwen/qwen2.5-coder-32b-instruct` | Code-specialized |
 | `microsoft/phi-4` | Lightweight, fast |
 
-Browse the full catalog at [build.nvidia.com](https://build.nvidia.com/models).
+Browse the full catalog at [build.nvidia.com/models](https://build.nvidia.com/models).
+
+### Ollama (free, fully local)
+
+Runs on your hardware — code never leaves your network.
+
+**Step 1 — Install Ollama:**
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama serve &
+ollama pull qwen2.5-coder:14b
+```
+
+**Step 2 — Review:**
+```bash
+inspectra review
+```
+
+**Recommended models:**
+
+| Model | RAM | Best for |
+|-------|-----|----------|
+| `qwen2.5-coder:7b` | 8 GB | Fast CI |
+| `qwen2.5-coder:14b` | 16 GB | **Default — best balance** |
+| `deepseek-coder:16b` | 20 GB | Deeper analysis |
+| `qwen2.5-coder:32b` | 40 GB | Enterprise-grade |
+
+### OpenAI / Anthropic / OpenRouter (paid cloud)
+
+```bash
+# OpenAI
+export OPENAI_API_KEY=sk-...
+inspectra review --provider openai --model gpt-4o-mini
+
+# Anthropic
+export ANTHROPIC_API_KEY=sk-ant-...
+inspectra review --provider anthropic --model claude-sonnet-4-20250514
+
+# OpenRouter (aggregator — one key, many models)
+export OPENROUTER_API_KEY=sk-or-...
+inspectra review --provider openrouter --model anthropic/claude-3.5-sonnet
+```
 
 ### Self-hosted NIM (air-gapped, on-prem)
 
@@ -199,6 +167,31 @@ Any OpenAI-compatible endpoint works:
 
 ```bash
 inspectra review --provider openai --base-url https://internal-proxy.company.com/v1
+```
+
+---
+
+## Quick Start
+
+### Install
+
+```bash
+pip install inspectra
+```
+
+### Review your local changes
+
+```bash
+inspectra review --provider nvidia --model meta/llama-3.3-70b-instruct
+```
+
+### Review a GitHub PR
+
+```bash
+export GITHUB_TOKEN=ghp_...
+export GITHUB_REPOSITORY=myorg/myrepo
+
+inspectra review --provider nvidia --pr 42 --post-comment
 ```
 
 ---
@@ -247,8 +240,8 @@ review options:
 Create `.inspectra.yml` (or run `inspectra init`):
 
 ```yaml
-provider: ollama
-model: qwen2.5-coder:14b
+provider: nvidia
+model: meta/llama-3.3-70b-instruct
 
 ollama:
   host: http://localhost:11434
@@ -293,9 +286,9 @@ inline_comments: true
 
 | Variable | Description |
 |----------|-------------|
+| `NVIDIA_API_KEY` | Nvidia NIM API key (free at build.nvidia.com) |
 | `OPENAI_API_KEY` | OpenAI API key |
 | `ANTHROPIC_API_KEY` | Anthropic API key |
-| `NVIDIA_API_KEY` | Nvidia NIM API key |
 | `OPENROUTER_API_KEY` | OpenRouter API key |
 | `GITHUB_TOKEN` | GitHub token for PR comments |
 | `GITHUB_REPOSITORY` | Repository in `owner/repo` format |
@@ -305,9 +298,9 @@ inline_comments: true
 
 ## GitHub Actions
 
-### Self-hosted with Ollama (recommended)
+### Self-hosted with Ollama (free, fully private)
 
-Free, private — your code never leaves your network.
+Your code never leaves your network. Requires a self-hosted runner with Ollama installed (see [Self-Hosted Runner Setup](#self-hosted-runner-setup)).
 
 ```yaml
 # .github/workflows/inspectra.yml
@@ -375,7 +368,7 @@ jobs:
           category: inspectra
 ```
 
-### Cloud with Nvidia NIM (free — no self-hosted runner needed)
+### Cloud with Nvidia NIM (free — no self-hosted runner)
 
 The easiest cloud option: free API key from [build.nvidia.com](https://build.nvidia.com), runs on GitHub-hosted runners, uses a 70B model.
 
@@ -417,56 +410,6 @@ jobs:
             --pr ${{ github.event.pull_request.number }}
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-      - name: Upload SARIF
-        if: always() && hashFiles('inspectra.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: inspectra.sarif
-          category: inspectra
-```
-
-### Cloud with OpenAI (paid)
-
-```yaml
-name: Inspectra Review
-
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-concurrency:
-  group: inspectra-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
-jobs:
-  inspectra:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      pull-requests: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install 'inspectra==0.2.0'
-      - name: Run review
-        continue-on-error: true
-        run: |
-          inspectra review \
-            --provider openai \
-            --model gpt-4o-mini \
-            --post-comment --inline \
-            --sarif inspectra.sarif \
-            --no-fail-on-high \
-            --pr ${{ github.event.pull_request.number }}
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
       - name: Upload SARIF
@@ -528,7 +471,6 @@ jobs:
 4. **Publish a release:**
 
 ```bash
-# Update version in pyproject.toml
 sed -i 's/version = "0.2.0"/version = "0.2.1"/' pyproject.toml
 git commit -am "bump: v0.2.1"
 git tag v0.2.1
@@ -592,27 +534,21 @@ inspectra review --baseline .inspectra-baseline.json
 
 Chunks use the model's full context window (capped at 16k). A 30-file PR on `gpt-4o-mini` makes ~5 LLM calls instead of ~30 — 6× fewer calls, 6× less latency.
 
----
-
-## Self-Hosted Runner Setup
+### Self-Hosted Runner Setup
 
 The Ollama workflow requires a self-hosted runner with Ollama installed.
 
-### 1. Set up the runner
-
-On a machine with ≥16 GB RAM (14B models) or ≥32 GB RAM (32B models):
+**Step 1 — Set up the runner** (on a machine with ≥16 GB RAM):
 
 ```bash
-# Create a directory for the runner
 mkdir ~/inspectra-runner && cd ~/inspectra-runner
 
-# Download the runner (Linux x64 example)
+# Download the runner (Linux x64)
 curl -o actions-runner-linux-x64.tar.gz -L \
   https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz
 tar xzf actions-runner-linux-x64.tar.gz
 
-# Configure (get the token from your repo settings)
-# Repo → Settings → Actions → Runners → New self-hosted runner
+# Configure (get the token from: Repo → Settings → Actions → Runners → New self-hosted runner)
 ./config.sh --url https://github.com/YOUR_ORG/YOUR_REPO --token YOUR_TOKEN
 
 # Install as a service (starts on boot)
@@ -620,15 +556,11 @@ sudo ./svc.sh install
 sudo ./svc.sh start
 ```
 
-### 2. Install Ollama on the runner
+**Step 2 — Install Ollama on the runner:**
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull the review model
 ollama pull qwen2.5-coder:14b
-
-# Start Ollama as a service (runs on port 11434)
 sudo systemctl enable --now ollama
 ```
 
@@ -636,12 +568,9 @@ Verify Ollama is running:
 
 ```bash
 curl http://localhost:11434/api/tags
-# Should return JSON with the list of pulled models
 ```
 
-### 3. Verify the runner is picking up jobs
-
-Open a PR against your repo. The runner should pick up the `Inspectra Review (Ollama)` workflow within a few seconds.
+**Step 3 — Open a PR.** The runner picks up the `Inspectra Review (Ollama)` workflow automatically.
 
 **Troubleshooting:**
 
@@ -650,17 +579,8 @@ Open a PR against your repo. The runner should pick up the `Inspectra Review (Ol
 | Runner shows "offline" | `sudo ./svc.sh status` on the runner machine |
 | Ollama not reachable | `curl http://localhost:11434/api/tags` — if it fails, `sudo systemctl restart ollama` |
 | Model not pulled | `ollama list` — if empty, `ollama pull qwen2.5-coder:14b` |
-| Out of memory | Use a smaller model: `ollama pull qwen2.5-coder:7b` and update `--model` in the workflow |
+| Out of memory | Use a smaller model: `ollama pull qwen2.5-coder:7b` |
 | GPU not used | `ollama ps` should show GPU — if CPU-only, install [CUDA](https://docs.nvidia.com/cuda/) |
-
-### 4. Recommended Ollama models
-
-| Model | RAM needed | Best for |
-|-------|-----------|----------|
-| `qwen2.5-coder:7b` | 8 GB | Fast CI, lightweight reviews |
-| `qwen2.5-coder:14b` | 16 GB | **Default — best balance** |
-| `deepseek-coder:16b` | 20 GB | Deeper analysis |
-| `qwen2.5-coder:32b` | 40 GB | Enterprise-grade reviews |
 
 ---
 
@@ -713,29 +633,6 @@ BaseLLMProvider (unified interface: LLMRequest → LLMResponse)
 
 Adding a 6th OpenAI-compatible provider is ~15 lines — just set the right `base_url` and default model.
 
----
-
-## Development
-
-```bash
-git clone https://github.com/iamakashsoni/inspectra.git
-cd inspectra
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-
-# Run tests (153 tests, all passing)
-pytest tests/ -v
-
-# Run the end-to-end smoke test (no live LLM needed)
-python scripts/smoke_test.py
-
-# Lint
-ruff check src/ tests/
-
-# Type check
-mypy src/
-```
-
 ### Project Structure
 
 ```
@@ -759,6 +656,29 @@ src/inspectra/
 └── utils/                 # Logger, tokenizer, chunker, cache, language detection
 
 tests/                     # 153 tests (one file per module)
+```
+
+---
+
+## Development
+
+```bash
+git clone https://github.com/iamakashsoni/inspectra.git
+cd inspectra
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+
+# Run tests (153 tests, all passing)
+pytest tests/ -v
+
+# Run the end-to-end smoke test (no live LLM needed)
+python scripts/smoke_test.py
+
+# Lint
+ruff check src/ tests/
+
+# Type check
+mypy src/
 ```
 
 ---
