@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""End-to-end smoke test for Inspectra v2 Phase 2 — no live LLM required.
+"""End-to-end smoke test for Inspectra — no live LLM required.
 
-Demonstrates the full Phase 2 pipeline:
+Demonstrates the full pipeline:
 1. Build a review prompt with file context, PR intent, related changes,
    analyzer findings, and language-specific rules
 2. Simulate an LLM response
