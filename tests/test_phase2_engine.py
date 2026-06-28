@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Tests for model-aware chunk tokens (Phase 2 #28) and ReviewContext wiring."""
+"""Tests for model-aware chunk tokens (#28) and ReviewContext wiring."""
 
 import asyncio
 import json
@@ -56,7 +56,6 @@ def test_effective_max_chunk_tokens_bigger_than_default():
     assert s.effective_max_chunk_tokens() > s.max_chunk_tokens  # 16000 > 3000
 
 
-# ── ReviewContext + Engine integration ───────────────────────────────────────
 
 class FakeProvider(BaseLLMProvider):
     """Returns a canned valid JSON response."""
@@ -75,8 +74,8 @@ class FakeProvider(BaseLLMProvider):
 
 
 def test_engine_with_empty_context_behaves_like_phase1():
-    """When ReviewContext is empty (all defaults), the engine runs Phase 1 behavior
-    but with Phase 2 features enabled by default (file context, analyzers, etc).
+    """When ReviewContext is empty (all defaults), the engine runs behavior
+    but with features enabled by default (file context, analyzers, etc).
     Passing None should still work."""
     provider = FakeProvider()
     settings = InspectraSettings(provider=LLMProvider.OLLAMA, dry_run=True)
@@ -100,7 +99,7 @@ def test_engine_disabling_file_context():
 
 
 def test_engine_disabling_all_phase2_features():
-    """When all Phase 2 features are disabled, behavior matches Phase 1 exactly."""
+    """When all features are disabled, behavior matches exactly."""
     provider = FakeProvider()
     settings = InspectraSettings(provider=LLMProvider.OLLAMA, dry_run=True)
     engine = ReviewEngine(provider=provider, settings=settings)
@@ -118,7 +117,7 @@ def test_engine_disabling_all_phase2_features():
 
 
 def test_review_context_defaults_enable_phase2():
-    """By default, ReviewContext should enable all Phase 2 features."""
+    """By default, ReviewContext should enable all features."""
     ctx = ReviewContext()
     assert ctx.enable_file_context is True
     assert ctx.enable_analyzers is True

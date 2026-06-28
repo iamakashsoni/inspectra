@@ -5,7 +5,7 @@
 
 """Settings and configuration models for Inspectra v2.
 
-Phase 1 changes:
+:
 - Added Nvidia + OpenRouter providers to the enum
 - Added per-provider base_url overrides (so users can point at self-hosted NIM, etc.)
 - Added review_concurrency setting (0 = auto, picks sensible default per provider)
@@ -42,7 +42,7 @@ class OllamaConfig(BaseSettings):
     timeout: int = 300
 
 
-# Approximate context windows for chunk-size auto-tuning (Phase 2 hook).
+# Approximate context windows for chunk-size auto-tuning (hook).
 MODEL_CONTEXT_WINDOWS: dict[str, int] = {
     "gpt-4o-mini": 128_000,
     "gpt-4o": 128_000,
@@ -164,7 +164,7 @@ class InspectraSettings(BaseSettings):
         return 3
 
     def effective_max_chunk_tokens(self) -> int:
-        """Phase 2: model-aware chunk size.
+        """ model-aware chunk size.
 
         Looks up the configured model's context window and uses up to half of it
         (leaving room for the prompt + response). Falls back to max_chunk_tokens

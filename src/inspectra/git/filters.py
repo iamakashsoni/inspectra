@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Filter files that should be skipped during code review (unchanged from v1)."""
+"""Filter files that should be skipped during code review."""
 
 from __future__ import annotations
 

@@ -10,7 +10,7 @@ rule_id field is parsed.
 
 import asyncio
 import json
-from typing import List
+
 
 from inspectra.config.settings import ReviewCategories
 from inspectra.llm.base import BaseLLMProvider, LLMRequest, LLMResponse
@@ -21,7 +21,7 @@ from inspectra.review.severity import Severity
 class FakeProvider(BaseLLMProvider):
     """Returns canned responses in sequence — for testing the retry loop."""
 
-    def __init__(self, responses: List[str]):
+    def __init__(self, responses: list[str]):
         super().__init__(system_prompt="test", model="fake")
         self.responses = responses
         self.calls = 0

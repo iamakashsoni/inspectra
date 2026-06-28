@@ -3,14 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Semgrep analyzer — multi-language static analysis.
-
-Wraps the `semgrep` CLI tool. Supports many languages (Python, JS, TS, Go,
-Java, Ruby, etc.). Findings are fed into the LLM prompt.
-
-Semgrep is NOT a hard dependency — if not installed, this analyzer
-silently no-ops. Install via `pip install semgrep` to enable.
-"""
+"""Semgrep analyzer — multi-language static analysis."""
 
 from __future__ import annotations
 

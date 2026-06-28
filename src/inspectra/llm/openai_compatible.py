@@ -3,21 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Base class for any provider that speaks the OpenAI Chat Completions API.
-
-This single class is the entire implementation for three providers:
-- OpenAI        (api.openai.com/v1)
-- Nvidia NIM    (integrate.api.nvidia.com/v1)  — same API, different default model
-- OpenRouter    (openrouter.ai/api/v1)         — same API, different default model
-
-That's the whole point: the user said "avoid over-complication." Three providers
-become ~30 lines of config each instead of 3× duplicated HTTP code.
-
-Audit fix (H1): a single httpx.AsyncClient is now created lazily per provider
-instance and reused across all complete() calls, enabling HTTP connection
-pooling. For a 30-file PR with concurrency=10, this eliminates ~27 redundant
-TCP+TLS handshakes.
-"""
+"""Base class for OpenAI Chat Completions-compatible providers (OpenAI, Nvidia NIM, OpenRouter)."""
 
 from __future__ import annotations
 
@@ -47,7 +33,7 @@ class OpenAICompatibleProvider(BaseLLMProvider):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.extra_headers = extra_headers or {}
-        # H1 fix: lazily-created, reused client for connection pooling
+        #  lazily-created, reused client for connection pooling
         self._client: httpx.AsyncClient | None = None
 
     def _get_client(self) -> httpx.AsyncClient:
@@ -137,7 +123,7 @@ class OpenAICompatibleProvider(BaseLLMProvider):
 def _normalize_finish_reason(reason: str) -> str:
     """Normalize provider-specific finish_reason values to a canonical set.
 
-    H5 fix: different providers use different names for the same concept.
+     different providers use different names for the same concept.
     We normalize to: stop | length | tool_call | content_filter | error
     """
     mapping = {

@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Tests for the analyzer plugin system (Phase 2 #21/#22)."""
+"""Tests for the analyzer plugin system (#21/#22)."""
 
 import tempfile
 from pathlib import Path
@@ -15,7 +15,6 @@ from inspectra.review.analyzers.registry import AnalyzerRegistry, build_default_
 from inspectra.utils.language import detect_language
 
 
-# ── RegexAnalyzer ────────────────────────────────────────────────────────────
 
 def test_regex_detects_eval_in_python():
     analyzer = RegexAnalyzer()
@@ -123,7 +122,6 @@ def test_regex_finding_has_suggested_fix():
     assert "ast.literal_eval" in eval_finding.suggested_fix or "safer" in eval_finding.suggested_fix.lower()
 
 
-# ── AnalyzerRegistry ─────────────────────────────────────────────────────────
 
 class _FakePythonAnalyzer(BaseAnalyzer):
     name = "fake_python"
@@ -210,7 +208,6 @@ def test_build_default_registry_skips_missing_bandit():
     assert "regex" in names  # regex is always there
 
 
-# ── BanditAnalyzer (only runs if bandit is installed) ────────────────────────
 
 def test_bandit_is_available_check():
     """is_available() should return True/False without crashing."""
@@ -228,7 +225,6 @@ def test_bandit_skips_when_not_installed():
         assert findings == []
 
 
-# ── SemgrepAnalyzer (only runs if semgrep is installed) ──────────────────────
 
 def test_semgrep_is_available_check():
     from inspectra.review.analyzers.semgrep_analyzer import SemgrepAnalyzer

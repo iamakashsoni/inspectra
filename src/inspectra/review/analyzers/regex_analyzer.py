@@ -3,19 +3,12 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Built-in regex analyzer — no external dependencies.
-
-Catches common antipatterns across multiple languages using simple regex
-patterns. Less powerful than Bandit/Semgrep but always available and fast.
-
-This is the "floor" of analyzer coverage — every Inspectra install gets it
-for free, even air-gapped ones with no pip extras.
-"""
+"""Built-in regex analyzer — no external dependencies."""
 
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from inspectra.review.analyzers.base import AnalyzerFinding, BaseAnalyzer
 

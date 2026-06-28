@@ -3,16 +3,11 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Format ReviewResult objects into human-readable outputs.
-
-Code-like suggested fixes render as GitHub ``suggestion`` blocks (one-click
-"Apply suggestion" button in the PR UI). Prose fixes render inline.
-"""
+"""Format ReviewResult objects into human-readable outputs."""
 
 from __future__ import annotations
 
 from inspectra.review.severity import ReviewResult, Severity
-from inspectra.utils.language import detect_language
 
 _SEVERITY_ORDER = [
     Severity.CRITICAL, Severity.HIGH, Severity.MEDIUM, Severity.LOW, Severity.INFO,

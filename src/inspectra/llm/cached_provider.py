@@ -3,12 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Caching wrapper for any LLM provider.
-
-Cache key includes all request fields that affect output (user_prompt,
-system_prompt, temperature, max_tokens, schema presence, model) so changing
-any of them correctly invalidates the cache.
-"""
+"""Caching wrapper for any LLM provider."""
 
 from __future__ import annotations
 

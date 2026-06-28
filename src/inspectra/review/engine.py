@@ -3,20 +3,12 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Review engine — orchestrates chunking, reviewing, and aggregating results.
-
-Phase 1: configurable concurrency (was hardcoded at 3).
-Phase 2: supports file context, PR intent, related changes, analyzer findings,
-         language rules, cross-file second pass, and baseline suppression.
-
-All Phase 2 features are opt-in via the ReviewContext dataclass — when it's
-empty (the default), the engine behaves identically to Phase 1.
-"""
+"""Review engine: orchestrates chunking, reviewing, and aggregating results."""
 
 from __future__ import annotations
 
 import asyncio
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
@@ -28,7 +20,7 @@ from inspectra.review.context_builder import build_file_context, extract_changed
 from inspectra.review.cross_file import run_cross_file_review
 from inspectra.review.prompts import build_pr_summary_prompt
 from inspectra.review.reviewer import ChunkReviewer
-from inspectra.review.severity import ReviewIssue, ReviewResult
+from inspectra.review.severity import ReviewResult
 from inspectra.utils.chunking import chunk_diff_by_file
 from inspectra.utils.language_rules import get_language_rules
 from inspectra.utils.logger import logger
@@ -36,9 +28,9 @@ from inspectra.utils.logger import logger
 
 @dataclass
 class ReviewContext:
-    """Optional context for a review run (Phase 2).
+    """Optional context for a review run .
 
-    When all fields are empty/None, the engine behaves identically to Phase 1.
+    Optional context for a review run.
     """
     pr_intent: str | None = None                  # PR title + body
     enable_file_context: bool = True              # Read full file content around changes
@@ -65,7 +57,7 @@ class ReviewEngine:
     ) -> list[ReviewResult]:
         """Review all provided file diffs and return aggregated results.
 
-        Phase 2: if `context` is provided, enables file context, analyzers,
+         if `context` is provided, enables file context, analyzers,
         cross-file review, and baseline suppression as configured.
         """
         if not file_diffs:
@@ -120,7 +112,7 @@ class ReviewEngine:
             async def review_chunk(chunk):
                 async with semaphore:
                     try:
-                        # Build per-chunk context (Phase 2)
+                        # Build per-chunk context 
                         kwargs: dict = {}
 
                         # File context: read the full file around changed lines
@@ -200,7 +192,7 @@ class ReviewEngine:
 
         merged = _merge_results(raw_results)
 
-        # Phase 2: cross-file second pass
+        #  cross-file second pass
         if ctx.enable_cross_file and len(file_diffs) > 1 and not self.settings.dry_run:
             logger.info("Running cross-file consistency review…")
             try:
@@ -217,7 +209,7 @@ class ReviewEngine:
             except Exception as exc:
                 logger.warning("Cross-file review failed: %s", exc)
 
-        # Phase 2: apply baseline suppression
+        #  apply baseline suppression
         if ctx.baseline is not None:
             merged, suppressed = apply_baseline(merged, ctx.baseline)
             if suppressed > 0:
@@ -263,9 +255,6 @@ class ReviewEngine:
         """Synchronous wrapper around `run`."""
         return asyncio.run(self.run(file_diffs, context))
 
-    def generate_pr_summary_sync(self, results: list[ReviewResult]) -> str:
-        """Synchronous wrapper around `generate_pr_summary`."""
-        return asyncio.run(self.generate_pr_summary(results))
 
     async def run_and_summarize(
         self,

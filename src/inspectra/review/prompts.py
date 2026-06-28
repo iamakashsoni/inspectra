@@ -3,34 +3,18 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Prompt templates for code review — v2.
-
-Phase 1 improvements vs original Inspectra:
-- PROMPT_VERSION stamp: bumped whenever the prompt changes. Cache invalidation
-  happens automatically via the cache key (which is sha256(prompt)).
-- Severity rubric: tells the LLM exactly what each severity means so different
-  models don't calibrate differently.
-- Few-shot example: shows the LLM what a GOOD finding looks like (concrete,
-  with a real fix) and what a BAD finding looks like (vague, no fix).
-- JSON Schema export: REVIEW_JSON_SCHEMA is passed to providers that support
-  structured output (OpenAI/Nvidia/OpenRouter json_schema, Anthropic tool_use,
-  Ollama format=) — eliminates the "response wasn't valid JSON" failure mode.
-- suggested_fix guidance: tell the LLM to emit replacement code (not prose) so
-  we can render it as a GitHub suggestion block.
-- rule_id field: stable identifier for SARIF baselines and suppression.
-"""
+"""Prompt templates for code review."""
 
 from __future__ import annotations
 
 from inspectra.config.settings import ReviewCategories
 from inspectra.utils.language import detect_language
 
-# ── Bump this when the prompt changes ─────────────────────────────────────────
-# v3: audit fixes (prompt injection defense, few-shot file_path placeholder)
-# v4: Phase 2 — file context, PR intent, related changes, analyzer findings,
+# v3: es (prompt injection defense, few-shot file_path placeholder)
+# v4: — file context, PR intent, related changes, analyzer findings,
 #     language-specific rules. All optional — when None, the prompt is
 #     identical to v3 (backward compatible).
-PROMPT_VERSION = "2026-06-28-v4"
+PROMPT_VERSION = "2026-06-28"
 
 
 SYSTEM_PROMPT = """\
@@ -141,7 +125,6 @@ If there are no issues, return an empty issues array with a positive summary.
 """
 
 
-# ── JSON Schema for providers that support structured output ─────────────────
 REVIEW_JSON_SCHEMA: dict = {
     "type": "object",
     "properties": {
@@ -191,7 +174,7 @@ def build_review_prompt(
     full_file_context: str | None = None,
     pr_intent: str | None = None,
     related_changes: list[str] | None = None,
-    analyzer_findings: list | None = None,
+    analyzer_findings: list[AnalyzerFinding] | None = None,
     language_rules: str | None = None,
 ) -> str:
     """Build a full review prompt for a single file diff chunk.
@@ -199,14 +182,14 @@ def build_review_prompt(
     The PROMPT_VERSION stamp is embedded in the text so cache keys
     (which are sha256 of this text) automatically invalidate on prompt bumps.
 
-    Phase 2 additions (all optional, keyword-only):
+    additions (all optional, keyword-only):
     - full_file_context: The full file content around changed lines (from context_builder)
     - pr_intent: The PR title + body, so the LLM understands the PR's goal
     - related_changes: List of signatures changed in OTHER files (cross-file awareness)
     - analyzer_findings: Deterministic findings (Bandit/Semgrep/regex) for the LLM to confirm/deny
     - language_rules: Language-specific antipattern hints (from language_rules module)
 
-    When all are None, the prompt is identical to the Phase 1 v3 prompt —
+    When all are None, the prompt is identical to the v3 prompt —
     backward compatible with existing callers and tests.
     """
     enabled = _enabled_categories(categories)

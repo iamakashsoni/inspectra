@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Tests for the cross-file consistency review (Phase 2 #25)."""
+"""Tests for the cross-file consistency review (#25)."""
 
 import asyncio
 import json

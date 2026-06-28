@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Tests for baseline suppression (Phase 2 #30)."""
+"""Tests for baseline suppression (#30)."""
 
 import json
 import tempfile

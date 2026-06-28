@@ -3,19 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Build rich context for a review prompt.
-
-Phase 2 introduces the single biggest quality win: giving the LLM the FULL
-file content around the changed lines, not just the diff. A diff alone tells
-you what changed but not what the surrounding code does — the LLM has to guess.
-
-This module:
-- Reads the working-tree version of a changed file
-- Identifies which line ranges were changed (from the diff, via unidiff)
-- Extracts a window of context around each changed range (default ±20 lines)
-- Truncates to a token budget, preserving the most relevant context
-- Falls back gracefully when the file can't be read (deleted, binary, etc.)
-"""
+"""Build file context around changed lines for review prompts."""
 
 from __future__ import annotations
 

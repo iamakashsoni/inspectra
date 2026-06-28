@@ -3,13 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""SARIF (Static Analysis Results Interchange Format) export.
-
-Phase 1 change: rule IDs are now stable. The LLM provides a `rule_id` directly
-(e.g. "SQL_INJECTION") and we use it as-is. If absent, we fall back to a hash
-of the normalized title so the same finding phrased differently across runs
-doesn't create two rule IDs.
-"""
+"""SARIF (Static Analysis Results Interchange Format) export."""
 
 from __future__ import annotations
 

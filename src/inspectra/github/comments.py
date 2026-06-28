@@ -3,12 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Post review comments to a GitHub Pull Request.
-
-Phase 1 change: `delete_previous_inspectra_comments` now ALSO deletes inline
-review comments (not just issue-level comments), preventing duplicates on
-re-runs after a force-push.
-"""
+"""Post review comments to a GitHub Pull Request."""
 
 from __future__ import annotations
 

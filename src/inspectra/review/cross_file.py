@@ -3,19 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Two-pass review: cross-file consistency check.
-
-Phase 2 #25: after the per-chunk pass, run a SECOND pass that looks at all
-the changed symbols across all files and asks the LLM to find cross-file
-inconsistencies:
-- Signature mismatches (caller updated, callee not — or vice versa)
-- Type mismatches between caller and callee
-- Missing error handling at call sites
-- Dead code (function deleted but still called elsewhere)
-
-This catches bugs the per-chunk pass can't see because each chunk only
-knows about one file.
-"""
+"""Cross-file consistency check (second review pass)."""
 
 from __future__ import annotations
 

@@ -3,12 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Language detection from file path — used by future analyzer routing
-and language-specific prompt sections.
-
-Phase 1 ships just the detection table; the per-language prompt logic
-comes in Phase 2.
-"""
+"""Language detection from file path."""
 
 from __future__ import annotations
 

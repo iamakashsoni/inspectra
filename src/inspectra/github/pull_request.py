@@ -3,12 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Fetch pull request data from GitHub.
-
-Phase 1 change: `get_pr_metadata` now returns `head_sha`, which is required by
-the inline-comment posting API (GitHub needs to know which commit the comment
-anchors to).
-"""
+"""Fetch pull request data from GitHub."""
 
 from __future__ import annotations
 
@@ -60,6 +55,6 @@ def get_pr_metadata(token: str, repo_name: str, pr_number: int) -> dict[str, str
         "author": pr.user.login,
         "base": pr.base.ref,
         "head": pr.head.ref,
-        "head_sha": pr.head.sha,           # NEW in v2
+        "head_sha": pr.head.sha,           # 
         "url": pr.html_url,
     }

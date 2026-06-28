@@ -3,16 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Baseline suppression — false-positive management.
-
-Phase 2 #30: lets users record "this finding is a false positive, don't
-report it again" in a `.inspectra-baseline.json` file. Findings matching
-the baseline are filtered out before output.
-
-This is essential for production use — without it, every Inspectra run
-re-reports the same false positives, and developers start ignoring all
-findings (alert fatigue).
-"""
+"""Baseline suppression — false-positive management."""
 
 from __future__ import annotations
 

@@ -3,15 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Abstract base class + request/response models for all LLM providers.
-
-Phase 1 change: replaces the old `review_code(prompt) -> str` interface with a
-richer `complete(LLMRequest) -> LLMResponse` that carries:
-- system_prompt (unified, no per-provider duplication)
-- json_schema (for structured output — eliminates ~30% of parse failures)
-- finish_reason (lets us detect truncation and retry)
-- token usage (for cost/latency observability)
-"""
+"""Abstract base class and request/response models for LLM providers."""
 
 from __future__ import annotations
 
@@ -56,13 +48,6 @@ class BaseLLMProvider(ABC):
     async def complete(self, request: LLMRequest) -> LLMResponse:
         """Send a request and return a response."""
         ...
-
-    async def review_code(self, prompt: str) -> str:
-        """Backwards-compat shim — old callers still work."""
-        resp = await self.complete(
-            LLMRequest(user_prompt=prompt, system_prompt=self.system_prompt)
-        )
-        return resp.text
 
     @property
     def name(self) -> str:

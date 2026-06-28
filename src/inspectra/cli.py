@@ -5,7 +5,7 @@
 
 """Inspectra v2 CLI — self-hosted AI code reviewer.
 
-Phase 1 changes vs original:
+ vs original:
 - `--provider` now accepts: ollama | openai | anthropic | nvidia | openrouter
 - `--inline / --no-inline` flag controls whether inline PR comments are posted
   (on by default when --post-comment is used and a PR number is set)
@@ -107,7 +107,7 @@ def review(
     ),
     no_file_context: bool = typer.Option(  # noqa: B008
         False, "--no-file-context",
-        help="Disable reading full file content around changed lines (Phase 2)",
+        help="Disable reading full file content around changed lines ",
     ),
     no_analyzers: bool = typer.Option(  # noqa: B008
         False, "--no-analyzers",
@@ -163,7 +163,7 @@ def review(
         err_console.print(f"[red]Config error:[/red] {exc}")
         raise typer.Exit(1) from None
 
-    # H3 fix: apply --base-url AFTER loading settings so we can MERGE into
+    #  apply --base-url AFTER loading settings so we can MERGE into
     # the existing OllamaConfig rather than replacing it (which would clobber
     # timeout and any other fields the user set in YAML).
     if base_url:
@@ -224,7 +224,7 @@ def review(
         err_console.print(f"[red]Provider error:[/red] {exc}")
         raise typer.Exit(1) from None
 
-    # ── Build Phase 2 review context ──────────────────────────────────────────
+    # ── Build review context ──────────────────────────────────────────
     from inspectra.review.engine import ReviewContext
     from inspectra.review.baseline import load_baseline
 
@@ -243,7 +243,7 @@ def review(
     )
 
     # ── Run review + summary in a single event loop ──────────────────────────
-    # H1 fix: run review and PR summary in ONE event loop so the provider's
+    #  run review and PR summary in ONE event loop so the provider's
     # shared AsyncClient (connection pool) is valid for both calls.
     engine = ReviewEngine(provider=provider_instance, settings=settings)
 

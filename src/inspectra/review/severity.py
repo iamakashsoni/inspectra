@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Severity levels and the ReviewIssue data model (unchanged shape from v1)."""
+"""Severity levels and the review issue data model."""
 
 from __future__ import annotations
 
@@ -57,7 +57,7 @@ class ReviewIssue(BaseModel):
     suggested_fix: str = ""
     file_path: str = ""
     line_number: int | None = None
-    rule_id: str = ""                  # NEW in v2: stable rule ID for SARIF + baselines
+    rule_id: str = ""                  # : stable rule ID for SARIF + baselines
 
     @property
     def display_title(self) -> str:

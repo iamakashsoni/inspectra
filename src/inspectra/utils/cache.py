@@ -3,12 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Disk-backed cache for LLM review responses.
-
-Phase 1: cache key signature unchanged on the surface — the prompt builder
-stamps PROMPT_VERSION into the prompt text, so a prompt bump invalidates
-all entries automatically without changing this module.
-"""
+"""Disk-backed cache for LLM review responses."""
 
 from __future__ import annotations
 
@@ -20,7 +15,7 @@ from pathlib import Path
 from inspectra.utils.logger import logger
 
 _DEFAULT_CACHE_DIR = Path(".inspectra_cache")
-_CACHE_VERSION = 2                          # Bumped for v2 (new key semantics)
+_CACHE_VERSION = 2                          #  (new key semantics)
 _DEFAULT_TTL_SECONDS = 60 * 60 * 24 * 7     # 7 days
 
 
@@ -77,7 +72,7 @@ class ReviewCache:
     def set(self, key: str, response: str) -> None:
         """Store a response in the cache.
 
-        H2 fix: writes to a temp file first, then atomically renames. A crash
+         writes to a temp file first, then atomically renames. A crash
         mid-write no longer leaves a corrupted cache entry that would cause
         a permanent cache miss for that key.
         """
@@ -88,7 +83,7 @@ class ReviewCache:
             "timestamp": time.time(),
             "response": response,
         }
-        # H2 fix: atomic write via temp file + rename
+        #  atomic write via temp file + rename
         tmp_path = path.with_suffix(".json.tmp")
         tmp_path.write_text(json.dumps(data), encoding="utf-8")
         # os.rename is atomic on POSIX (same filesystem). On Windows, need to

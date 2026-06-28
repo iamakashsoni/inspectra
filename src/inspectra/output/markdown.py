@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Write review output to a Markdown file (delegates to review/formatter.py)."""
+"""Write review output to a Markdown file."""
 
 from __future__ import annotations
 

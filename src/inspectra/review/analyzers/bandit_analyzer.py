@@ -3,14 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Bandit analyzer — Python security linter.
-
-Wraps the `bandit` CLI tool. Only runs on Python files. Findings are fed
-into the LLM prompt for confirmation/enrichment.
-
-Bandit is NOT a hard dependency — if it's not installed, this analyzer
-silently no-ops. Install via `pip install bandit` to enable.
-"""
+"""Bandit analyzer — Python security linter."""
 
 from __future__ import annotations
 

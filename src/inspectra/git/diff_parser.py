@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Parse git diffs and extract per-file changed hunks (unchanged from v1)."""
+"""Parse git diffs into per-file changed hunks."""
 
 from __future__ import annotations
 

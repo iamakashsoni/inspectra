@@ -3,17 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Anthropic Claude provider.
-
-Uses the Messages API with tool-calling forced to `submit_review` so we get
-guaranteed-valid structured output (no fence-stripping, no truncation loss).
-
-Audit fixes:
-- H1: Shared httpx.AsyncClient for connection pooling (was: new client per request)
-- H5: finish_reason normalized via _normalize_finish_reason (was: raw Anthropic
-  stop_reason values like 'end_turn', 'max_tokens' which didn't match the
-  reviewer's 'length' check)
-"""
+"""Anthropic Claude provider (Messages API with forced tool-call for structured output)."""
 
 from __future__ import annotations
 
@@ -46,7 +36,7 @@ class AnthropicProvider(BaseLLMProvider):
         self.api_key = api_key
         self.base_url = (base_url or self.BASE_URL).rstrip("/")
         self.timeout = timeout
-        # H1 fix: lazily-created, reused client
+        #  lazily-created, reused client
         self._client: httpx.AsyncClient | None = None
 
     def _get_client(self) -> httpx.AsyncClient:
@@ -112,7 +102,7 @@ class AnthropicProvider(BaseLLMProvider):
                 # Serialize the tool input back to JSON for our parser
                 text = json.dumps(block.get("input", {}))
 
-        # H5 fix: normalize Anthropic's stop_reason to canonical finish_reason
+        #  normalize Anthropic's stop_reason to canonical finish_reason
         finish_reason = _normalize_finish_reason(raw_stop_reason)
 
         usage = data.get("usage", {})

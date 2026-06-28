@@ -3,12 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Language-specific antipattern rules for the review prompt.
-
-For each detected language, returns a short list of high-signal things the
-LLM should specifically look for. This gives the LLM language-specific
-expertise without bloating the prompt for languages not in the diff.
-"""
+"""Language-specific antipattern rules for the review prompt."""
 
 from __future__ import annotations
 

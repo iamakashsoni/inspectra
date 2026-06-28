@@ -93,7 +93,7 @@ def post_inline_comments(
         return 0
 
     # Pre-filter qualifying issues
-    candidates: list[tuple[ReviewResult, any]] = []
+    candidates: list[tuple[ReviewResult, ReviewIssue]] = []
     for result in results:
         for issue in result.issues:
             if _severity_rank[issue.severity] > min_rank:

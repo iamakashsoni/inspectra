@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Tests for the file context builder (Phase 2 #16)."""
+"""Tests for the file context builder (#16)."""
 
 import tempfile
 from pathlib import Path

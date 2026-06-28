@@ -3,11 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Factory that instantiates the correct LLM provider from settings.
-
-Phase 1: now supports 5 providers (added Nvidia + OpenRouter). All
-OpenAI-compatible providers share the same code path, just different defaults.
-"""
+"""Instantiate the configured LLM provider from settings."""
 
 from __future__ import annotations
 

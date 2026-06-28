@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Tests for Phase 2 prompt context blocks (#16, #17, #18, #22, #24)."""
+"""Tests for prompt context blocks (#16, #17, #18, #22, #24)."""
 
 from inspectra.config.settings import ReviewCategories
 from inspectra.review.analyzers.base import AnalyzerFinding
@@ -104,7 +104,7 @@ def test_prompt_without_language_rules_omits_block():
 
 
 def test_prompt_with_all_context_blocks():
-    """All Phase 2 blocks can be combined in one prompt."""
+    """All blocks can be combined in one prompt."""
     findings = [AnalyzerFinding(
         rule_id="REGEX/EVAL", severity="high", category="Security",
         title="eval() usage", explanation="bad",
@@ -126,8 +126,8 @@ def test_prompt_with_all_context_blocks():
 
 
 def test_prompt_version_is_v4():
-    """Phase 2 bumps the prompt version to v4 for cache invalidation."""
-    assert PROMPT_VERSION == "2026-06-28-v4"
+    """bumps the prompt version to v4 for cache invalidation."""
+    assert PROMPT_VERSION == "2026-06-28"
 
 
 def test_phase2_context_changes_cache_key():
@@ -137,10 +137,9 @@ def test_phase2_context_changes_cache_key():
         "test.py", "+pass\n", full_file_context="x = 1\n",
     )
     assert prompt_no_ctx != prompt_with_ctx, \
-        "Phase 2 context must change the prompt text (so cache keys differ)"
+        "context must change the prompt text (so cache keys differ)"
 
 
-# ── Language rules module ────────────────────────────────────────────────────
 
 def test_language_rules_python():
     from inspectra.utils.language_rules import get_language_rules

@@ -3,15 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Core reviewer: sends a diff chunk to the LLM and parses the response.
-
-- Uses LLMRequest/LLMResponse interface with structured JSON output (schema-enforced)
-- Retries on JSON parse failure (with corrective prompt) and transient network
-  errors (timeouts, 429, 503) with exponential backoff
-- Detects response truncation via finish_reason
-- Phase 2: accepts file context, PR intent, related changes, analyzer findings,
-  and language rules to enrich the prompt
-"""
+"""Core reviewer: sends a diff chunk to the LLM and parses the response."""
 
 from __future__ import annotations
 
@@ -64,7 +56,7 @@ class ChunkReviewer:
         full_file_context: str | None = None,
         pr_intent: str | None = None,
         related_changes: list[str] | None = None,
-        analyzer_findings: list | None = None,
+        analyzer_findings: list[AnalyzerFinding] | None = None,
         language_rules: str | None = None,
     ) -> ReviewResult:
         """Run a review and return structured results, with retry on failure."""

@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Split large diffs into LLM-safe chunks (unchanged from v1 — already correct)."""
+"""Split large diffs into LLM-safe chunks."""
 
 from __future__ import annotations
 

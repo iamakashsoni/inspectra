@@ -3,17 +3,7 @@
 # Licensed under the MIT License. See LICENSE in the project root
 # for the full license text. You may not claim authorship of this work.
 
-"""Ollama local LLM provider.
-
-Phase 1 changes vs original Inspectra:
-- Uses /api/chat (not /api/generate) so we get a proper system message slot
-- Passes `format=<json_schema>` so Ollama enforces valid JSON output
-- Accepts a configurable base URL (so users can point at a remote Ollama box)
-
-Audit fixes:
-- H1: Shared httpx.AsyncClient for connection pooling (was: new client per request)
-- H5: finish_reason normalized (Ollama's done_reason 'length' → 'length')
-"""
+"""Ollama local LLM provider."""
 
 from __future__ import annotations
 
@@ -40,7 +30,7 @@ class OllamaProvider(BaseLLMProvider):
         super().__init__(system_prompt=system_prompt, model=model)
         self.host = host.rstrip("/")
         self.timeout = timeout
-        # H1 fix: lazily-created, reused client
+        #  lazily-created, reused client
         self._client: httpx.AsyncClient | None = None
 
     def _get_client(self) -> httpx.AsyncClient:
@@ -87,7 +77,7 @@ class OllamaProvider(BaseLLMProvider):
         data = resp.json()
         message = data.get("message", {})
 
-        # H5 fix: normalize Ollama's done_reason to canonical finish_reason
+        #  normalize Ollama's done_reason to canonical finish_reason
         done_reason = data.get("done_reason", "stop")
         finish_reason = _normalize_finish_reason(done_reason)
 

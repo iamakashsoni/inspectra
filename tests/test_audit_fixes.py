@@ -31,7 +31,6 @@ from inspectra.review.severity import ReviewIssue, ReviewResult, Severity
 from inspectra.utils.cache import ReviewCache
 
 
-# ── C1: CachedProvider cache key must include temperature + system_prompt ────
 
 class FakeProviderForCache(BaseLLMProvider):
     def __init__(self):
@@ -87,7 +86,6 @@ def test_c1_cache_hit_when_all_fields_match():
         assert provider.call_count == 1, "Identical requests should hit cache"
 
 
-# ── C2: _looks_like_code must not treat prose starting with - or + as code ──
 
 def test_c2_hyphen_prose_is_not_code():
     """'- Remove the import' is prose, not code — must NOT render as suggestion block."""
@@ -119,7 +117,6 @@ def test_c2_render_does_not_suggest_prose_with_hyphen():
     assert "Remove the" in out
 
 
-# ── C3: Few-shot example must not use a real file_path ───────────────────────
 
 def test_c3_few_shot_uses_placeholder_not_real_path():
     """The few-shot example must use a placeholder, not 'auth/service.py',
@@ -132,7 +129,6 @@ def test_c3_few_shot_uses_placeholder_not_real_path():
     assert "actual file path" in prompt or "<" in prompt
 
 
-# ── C4: post_inline_comments must fetch commit ONCE, not per-issue ───────────
 
 def test_c4_inline_comments_fetch_commit_once():
     """repo.get_commit() must be called exactly ONCE regardless of issue count."""
@@ -195,7 +191,6 @@ def test_c4_inline_comments_skips_when_commit_fetch_fails():
     assert posted == 0
 
 
-# ── C5: Network errors must be retried, not immediately fail ─────────────────
 
 class FakeProviderWithNetworkRetry(BaseLLMProvider):
     """Fails with transient errors N times, then succeeds."""
@@ -249,7 +244,6 @@ def test_c5_does_not_retry_on_401():
     assert "401" in result.summary or "failed" in result.summary.lower()
 
 
-# ── C6: asyncio.gather must use return_exceptions ────────────────────────────
 
 class ExplodingProvider(BaseLLMProvider):
     """Provider whose complete() raises a non-transient, non-parse error."""
@@ -278,7 +272,6 @@ def test_c6_one_chunk_failure_does_not_kill_others():
     assert len(merged) == 2, "Both results (success + failure) must be preserved"
 
 
-# ── H1: Provider must reuse a single AsyncClient (connection pooling) ────────
 
 def test_h1_provider_reuses_single_client():
     """Multiple complete() calls must reuse the same AsyncClient."""
@@ -327,7 +320,6 @@ def test_h1_provider_reuses_single_client():
         httpx.AsyncClient.__init__ = original_init
 
 
-# ── H2: Cache writes must be atomic ──────────────────────────────────────────
 
 def test_h2_cache_write_is_atomic():
     """A successful set() must leave a valid, readable cache entry.
@@ -361,7 +353,6 @@ def test_h2_cache_survives_concurrent_writes():
             assert cache.get(f"key{i}") == f"value{i}"
 
 
-# ── H3: --base-url for Ollama must not clobber timeout ───────────────────────
 
 def test_h3_ollama_base_url_preserves_timeout():
     """Setting --base-url for Ollama must not reset timeout to a default.
@@ -387,7 +378,7 @@ ollama:
         assert settings.ollama.timeout == 999, "YAML timeout must load"
         assert settings.ollama.host == "http://original:11434"
 
-        # Step 2: apply --base-url override the way the CLI does it (H3 fix)
+        # Step 2: apply --base-url override the way the CLI does it
         base_url = "http://override:11434"
         settings.ollama = OllamaConfig(
             host=base_url,
@@ -401,7 +392,6 @@ ollama:
             f"--base-url clobbered timeout (got {settings.ollama.timeout}, expected 999)"
 
 
-# ── H4: System prompt must include prompt-injection defense ──────────────────
 
 def test_h4_system_prompt_warns_about_injection():
     """The system prompt must explicitly warn the LLM about prompt injection
@@ -412,7 +402,6 @@ def test_h4_system_prompt_warns_about_injection():
     assert "diff" in SYSTEM_PROMPT.lower()
 
 
-# ── H5: finish_reason must be normalized across providers ────────────────────
 
 def test_h5_normalize_anthropic_max_tokens():
     """Anthropic's 'max_tokens' must normalize to 'length' so the reviewer's
@@ -446,7 +435,6 @@ def test_h5_normalize_empty():
     assert _normalize_finish_reason("") == "stop"
 
 
-# ── H6: reviewer must not use 'response' in locals() ─────────────────────────
 
 def test_h6_corrective_prompt_gets_bad_response_on_provider_error():
     """If provider.complete() raises (not parse error), the corrective prompt
@@ -478,23 +466,22 @@ def test_h6_corrective_prompt_gets_bad_response_on_provider_error():
     assert result.summary == "recovered"
 
 
-# ── Integration: full prompt → parse → format chain still works ──────────────
 
 def test_full_chain_with_v4_prompt():
-    """Verify the full pipeline works with the v4 prompt (post Phase 2 additions).
+    """Verify the full pipeline works with the v4 prompt (post additions).
 
-    v3 → v4 bump: Phase 2 adds optional context blocks (file content, PR intent,
+    v3 → v4 bump: adds optional context blocks (file content, PR intent,
     related changes, analyzer findings, language rules). When none are provided,
     the prompt is identical to v3 — backward compatible.
     """
-    # Version must have bumped to v4 for Phase 2
-    assert PROMPT_VERSION == "2026-06-28-v4", f"Expected v4, got {PROMPT_VERSION}"
+    # Version must be set
+    assert PROMPT_VERSION == "2026-06-28", f"Expected, got {PROMPT_VERSION}"
 
-    # Build a prompt with NO Phase 2 context — must still include the audit fixes
+    # Build a prompt with NO context — must still include the es
     prompt = build_review_prompt("test.py", "+x = 1\n")
     assert "injection" in prompt.lower()
     assert '"file_path": "auth/service.py"' not in prompt
-    # Must NOT include Phase 2 blocks when none are provided
+    # Must NOT include blocks when none are provided
     assert "PR Intent" not in prompt
     assert "Full file content" not in prompt
     assert "Other files changed" not in prompt
